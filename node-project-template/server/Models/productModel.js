@@ -1,16 +1,23 @@
-// models/product.model.js
-
-//import mongoose from 'mongoose';
-//const { Schema } = mongoose;
 import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
+import sequelize from '../config/database.js'; // Đảm bảo rằng đường dẫn đúng
 
-
-const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    price: { type: Number, required: true },
-    description: { type: String, required: true }
+const Product = sequelize.define('Product', {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+    },
+    imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 });
 
-module.exports = mongoose.model('Product', productSchema);
-
+export default Product;

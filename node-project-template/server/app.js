@@ -3,6 +3,11 @@ import logger from 'morgan';
 import { Sequelize } from 'sequelize';
 import { config } from 'dotenv';
 
+// Routes
+import usersRouter from './routes/users.routes.js';
+import adminRouter from './routes/admin.routes.js';
+import productsRouter from './routes/products.routes.js';
+
 config(); // Load environment variables
 
 // Sequelize Setup
@@ -26,9 +31,7 @@ sequelize.authenticate()
         console.error('Unable to connect to the MySQL database:', err);
     });
 
-// Routes
-import usersRouter from './routes/users.routes.js';
-import adminRouter from './routes/admin.routes.js';
+
 
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);

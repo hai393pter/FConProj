@@ -1,19 +1,18 @@
-// routes/products.routes.js
-
 import express from 'express';
-const router = express.Router();
-const productController = require('../controllers/products.controller');
+import productsControllers from '../Controllers/product.controllers.js'; // Đảm bảo rằng đường dẫn đúng
+import checkAuth from '../middlewares/checkAuth.middleware.js'; // Nếu bạn muốn kiểm tra xác thực cho các phương thức này
+import routers from './users.routes.js';
 
-// Lấy danh sách sản phẩm
-router.get('/', productController.getAllProducts);
+const routers = express.Router();
 
-// Lấy chi tiết sản phẩm
-router.get('/:id', productController.getProductById);
+// Tạo sản phẩm mới
+routers.post('/', checkAuth, productsControllers.createProduct);
 
-// Thêm sản phẩm mới (nếu có quyền)
-router.post('/', productController.addProduct);
+// Kiểm tra thông tin sản phẩm theo ID
+routers.get('/:id', productsControllers.getProduct);
 
-// Xóa sản phẩm
-router.delete('/:id', productController.deleteProduct);
+// Chỉnh sửa thông tin sản phẩm theo ID
+routers.put('/:id', checkAuth, productsControllers.updateProduct);
 
-module.exports = router;
+// Xuất router
+export default routers;

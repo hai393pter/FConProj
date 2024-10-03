@@ -1,7 +1,9 @@
 import Product from '../Models/productModel.js'; // Đảm bảo đường dẫn đúng
 
 // Tạo sản phẩm mới
+
 export const createProduct = async (req, res) => {
+    console.log('Received body:', req.body);
     const { name, price, description } = req.body; // Lấy thông tin sản phẩm từ body
 
     try {

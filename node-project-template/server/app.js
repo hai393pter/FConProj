@@ -35,6 +35,7 @@ sequelize.authenticate()
 
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
+app.use('/products', productsRouter);
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {

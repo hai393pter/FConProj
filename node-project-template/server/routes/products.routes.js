@@ -3,16 +3,16 @@ import productsControllers from '../Controllers/product.controllers.js'; // Đ�
 import checkAuth from '../middlewares/checkAuth.middleware.js'; // Nếu bạn muốn kiểm tra xác thực cho các phương thức này
 import routers from './users.routes.js';
 
-const routers = express.Router();
+const router = express.Router();
 
 // Tạo sản phẩm mới
-routers.post('/', checkAuth, productsControllers.createProduct);
+router.post('/', checkAuth, productsControllers.createProduct);
 
 // Kiểm tra thông tin sản phẩm theo ID
-routers.get('/:id', productsControllers.getProduct);
+router.get('/:id', productsControllers.getProduct);
 
 // Chỉnh sửa thông tin sản phẩm theo ID
-routers.put('/:id', checkAuth, productsControllers.updateProduct);
+router.put('/:id', checkAuth, productsControllers.updateProduct);
 
 // Xuất router
-export default routers;
+export default router;

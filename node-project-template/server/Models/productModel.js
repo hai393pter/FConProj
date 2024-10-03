@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js'; // Đảm bảo rằng đường dẫn đúng
+import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng
 
 const Product = sequelize.define('Product', {
     name: {
@@ -7,16 +7,16 @@ const Product = sequelize.define('Product', {
         allowNull: false,
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     price: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.FLOAT,
         allowNull: false,
     },
     imageUrl: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false, // Đảm bảo trường này không được null
     },
 });
 

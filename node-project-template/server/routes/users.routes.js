@@ -54,13 +54,13 @@ usersRouter.post('/register', userControllers.register);
  *                 type: string
  *               password:
  *                 type: string
+ *     security:
+ *       - bearerAuth: [] 
  *     responses:
  *       200:
  *         description: Successful login
  *       401:
  *         description: Invalid credentials
- *     security:
- *       - bearerAuth: [] 
  */
 usersRouter.post('/login', userControllers.login);
 

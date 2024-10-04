@@ -13,6 +13,7 @@ const router = express.Router();
  *   post:
  *     tags:
  *       - Products
+ *     summary: Tạo sản phẩm mới
  *     description: Create a new product
  *     requestBody:
  *       required: true
@@ -46,6 +47,7 @@ router.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
  *   get:
  *     tags:
  *       - Products
+ *     summary: Kiểm tra thông tin sản phẩm theo ID
  *     description: Get product information by ID
  *     parameters:
  *       - in: path
@@ -87,6 +89,7 @@ router.get('/:id', productsControllers.getProduct);
  *   put:
  *     tags:
  *       - Products
+ *     summary: Chỉnh sửa thông tin sản phẩm theo ID
  *     description: Update product information by ID
  *     parameters:
  *       - in: path

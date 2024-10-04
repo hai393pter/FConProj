@@ -1,8 +1,11 @@
 // swagger.js
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import swaggerAutogen from 'swagger-autogen';
 import express from 'express';
+
 const app = express();
+
 const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
@@ -20,12 +23,13 @@ const swaggerOptions = {
                 },
             },
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
+        
     },
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
         servers: [
             {
                 url: 'http://localhost:3000', // Thay đổi URL này cho phù hợp với môi trường của bạn
@@ -36,5 +40,8 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
 export default { swaggerDocs, swaggerUi };

@@ -1,17 +1,30 @@
-// models/cart.model.js
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../database';
+import User from './userModel'
+class Cart extends Model {}
 
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
-
-
-const cartSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
-    items: [
-        {
-            product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-            quantity: { type: Number, default: 1 }
-        }
-    ]
+Cart.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: 'id',
+        },
+        allowNull: false,
+    }
+}, {
+    sequelize,
+    modelName: 'Cart',
+    tableName: 'carts',
+    timestamps: true,
 });
 
-module.exports = mongoose.model('Cart', cartSchema);
+// Setting up associations
+Cart.belongsTo(User, { foreignKey: 'userId' });
+
+export default Cart;

@@ -1,5 +1,5 @@
 // models/CareSchedule.js
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database.js';
 
 class CareSchedule extends Model {}
@@ -37,4 +37,4 @@ CareSchedule.init({
     timestamps: false,
 });
 
-module.exports = CareSchedule;
+export default CareSchedule;

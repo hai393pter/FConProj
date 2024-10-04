@@ -1,5 +1,5 @@
 // models/ProductImage.js
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database.js';
 
 
@@ -30,8 +30,8 @@ ProductImage.init({
 }, {
     sequelize,
     modelName: 'ProductImage',
-    tableName: 'ProductImages',
+    tableName: 'productimages',
     timestamps: false,
 });
 
-module.exports = ProductImage;
+export default ProductImage;

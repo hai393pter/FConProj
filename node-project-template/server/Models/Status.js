@@ -1,5 +1,5 @@
 // models/Status.js
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database.js';
 
 class Status extends Model {}
@@ -29,8 +29,8 @@ Status.init({
 }, {
     sequelize,
     modelName: 'Status',
-    tableName: 'Status',
+    tableName: 'status',
     timestamps: false,
 });
 
-module.exports = Status;
+export default Status;

@@ -1,42 +1,40 @@
 // ordermodel.js
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import { Model } from 'sequelize';
+import sequelize from '../database';
+import User from './userModel'
+class Order extends Model {}
 
-
-// Định nghĩa schema cho order
-const OrderSchema = new Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Liên kết với model User
-        required: true
+Order.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
     },
-    products: [{
-        productId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product', // Liên kết với model Product (bạn cần tạo file productmodel.js nếu chưa có)
-            required: true
+    userId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: 'id'
         },
-        quantity: {
-            type: Number,
-            required: true,
-            default: 1
-        }
-    }],
+        allowNull: false,
+    },
     totalPrice: {
-        type: Number,
-        required: true
+        type: DataTypes.FLOAT,
+        allowNull: false,
     },
     status: {
-        type: String,
-        default: 'Pending' // Trạng thái mặc định là "Pending"
+        type: DataTypes.STRING,
+        defaultValue: 'Pending',
     },
     createdAt: {
-        type: Date,
-        default: Date.now
-    }
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+    },
+}, {
+    sequelize,
+    modelName: 'Order',
+    tableName: 'orders',
+    timestamps: false,
 });
 
-// Tạo model từ schema
-const Order = mongoose.model('Order', OrderSchema);
-
-module.exports = Order;
+export default Order;

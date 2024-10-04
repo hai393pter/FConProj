@@ -1,24 +1,28 @@
-module.exports = {
-    development: {
-      username: "FConnectAdmin",
-      password: "FConnectRoot",
-      database: "qldb",
-      host: "127.0.0.1",
-      dialect: "mysql",
+import { config } from "dotenv";
+
+config();
+
+const ApplicationConfig = {
+  development: {
+    datastore: {
+      database: process.env.DATABASE,
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+      options: {
+        host: process.env.HOST,
+        dialect: 'mysql',
+        dialectOptions: {
+          ssl: {
+              rejectUnauthorized: true
+          }
+        }
+      },
     },
-    test: {
-      username: "FConnectAdmin",
-      password: "FConnectRoot",
-      database: "qldb",
-      host: "127.0.0.1",
-      dialect: "mysql",
-    },
-    production: {
-      username: "FConnectAdmin",
-      password: "FConnectRoot",
-      database: "qldb",
-      host: "127.0.0.1",
-      dialect: "mysql",
-    },
-  };
+    api: {
+      port: process.env.PORT || 3000,
+    }
+  },
+}
+
+export default ApplicationConfig;
   

@@ -32,7 +32,7 @@ const swaggerOptions = {
     ],
         servers: [
             {
-                url: 'http://localhost:3000', // Thay đổi URL này cho phù hợp với môi trường của bạn
+                url: '/',
             },
         ],
     
@@ -41,7 +41,4 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-
-export default { swaggerDocs, swaggerUi };
+export default swaggerDocs;

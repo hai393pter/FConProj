@@ -1,0 +1,8 @@
+services:
+  plant-api:
+    image: plant-api:latest
+    build:
+      context: .
+      dockerfile: ./node-project-template/server/Dockerfile
+    ports:
+      - 80:3000

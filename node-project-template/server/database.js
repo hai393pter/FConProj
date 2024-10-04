@@ -1,18 +1,24 @@
 import { Sequelize } from "sequelize";
+import ApplicationConfig from './config/config.js';
 
-// Thay thế thông tin dưới đây với giá trị thực tế của bạn
-const sequelize = new Sequelize('qldb', 'FConnectAdmin', 'FConnectRoot', {
-    host: 'localhost',
-    dialect: 'mysql',
+const connection =  ApplicationConfig.development.datastore;
+// Sequelize Setup
+const sequelize = new Sequelize(connection.database, connection.username, connection.password, {
+    host: connection.options.host,
+    dialect: connection.options.dialect,
+    dialectOptions: {
+        ssl: {
+            rejectUnauthorized: true
+        }
+    }
 });
 
-async function testConnection() {
-    try {
-        await sequelize.authenticate();
-        console.log('Kết nối đến cơ sở dữ liệu thành công.');
-    } catch (error) {
-        console.error('Không thể kết nối đến cơ sở dữ liệu:', error);
-    }
-}
+sequelize.authenticate()
+    .then(() => {
+        console.log('MySQL Database Connected Successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the MySQL database:', err);
+});
 
 export default sequelize;

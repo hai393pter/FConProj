@@ -1,0 +1,13 @@
+services:
+  plant-api:
+    image: ${DOCKER_USER}/plant-api:latest
+    environment:
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: ${NODE_ENV}
+      DATABASE: ${DATABASE}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${PASSWORD}
+      HOST: ${HOST}
+    ports:
+      - 80:3000

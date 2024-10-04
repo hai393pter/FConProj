@@ -32,7 +32,7 @@ const swaggerOptions = {
             description: 'API information',
         },
     },
-    apis: ['server/routes/*.js'], // Đường dẫn đến các file routes
+    apis: ['./routes/*.js'], // Đường dẫn đến các file routes
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

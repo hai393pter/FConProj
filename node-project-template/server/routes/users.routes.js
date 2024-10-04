@@ -4,11 +4,15 @@ import checkAuth from '../middlewares/checkAuth.middleware.js';
 import userControllers from '../Controllers/users.controllers.js';
 //import routers from './users.routes.js';
 
-const routers = express.Router();
+const usersRouter = express.Router();
 
-routers.post('/register', userControllers.register); // Correct usage for default export
-routers.post('/login', userControllers.login);
-routers.get('/me', checkAuth, userControllers.getMe);
+usersRouter.post('/register', userControllers.register);
+
+// User Login
+usersRouter.post('/login', userControllers.login);
+
+// Get Current User (authenticated)
+usersRouter.get('/me', checkAuth, userControllers.getMe);
 
 
-export default routers;
+export default usersRouter;

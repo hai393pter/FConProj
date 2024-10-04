@@ -2,6 +2,13 @@ import express from 'express';
 import logger from 'morgan';
 import { Sequelize } from 'sequelize';
 import { config } from 'dotenv';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerDocument from './swagger.js';
+
+
 
 // Routes
 import usersRouter from './routes/users.routes.js';
@@ -15,12 +22,34 @@ const sequelize = new Sequelize('qldb', 'FConnectAdmin', 'FConnectRoot', {
     host: 'localhost',
     dialect: 'mysql', // Use MySQL
 });
+// Cấu hình Swagger
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Documentation',
+            version: '1.0.0',
+            description: 'API information',
+        },
+    },
+    apis: ['server/routes/*.js'], // Đường dẫn đến các file routes
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
+
 
 // Express App Setup
 const app = express();
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
+
+// Thêm middleware Swagger
+// Cấu hình Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Sequelize Database Connection
 sequelize.authenticate()
@@ -30,7 +59,6 @@ sequelize.authenticate()
     .catch(err => {
         console.error('Unable to connect to the MySQL database:', err);
     });
-
 
 
 app.use('/users', usersRouter);
@@ -52,7 +80,8 @@ app.use(function(err, req, res, next) {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000; // Use the PORT defined in your environment or default to 3000
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Swagger UI is available at http://localhost:${PORT}/api-docs`);
 });

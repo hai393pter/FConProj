@@ -6,8 +6,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: ${NODE_ENV}
       DATABASE: ${DATABASE}
-      USERNAME: ${USERNAME}
-      PASSWORD: ${PASSWORD}
-      HOST: ${HOST}
+      DB_USERNAME: ${USERNAME}
+      DB_PASSWORD: ${PASSWORD}
+      DB_HOST: ${HOST}
     ports:
       - 80:3000

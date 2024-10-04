@@ -21,7 +21,7 @@ jobs:
               run: docker compose build plant-api && docker compose push
     
     client-deploy:
-        runs-on: arisa-server
+        runs-on: hai-server
         needs: build-image
         env: 
             DOCKER_USER: ${{secrets.DOCKER_USERNAME}}

@@ -18,7 +18,7 @@ jobs:
                 username: ${{ secrets.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_PASSWORD }}
             - name: Build Image And Push
-              run: docker compose build glam-client && docker compose push
+              run: docker compose build plant-api && docker compose push
     
     client-deploy:
         runs-on: arisa-server

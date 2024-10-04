@@ -1,13 +1,14 @@
 import Product from '../Models/productModel.js'; // Đảm bảo đường dẫn đúng
+import moment from 'moment';
 
 // Tạo sản phẩm mới
 
 export const createProduct = async (req, res) => {
-    console.log('Received body:', req.body);
-    const { name, price, description } = req.body; // Lấy thông tin sản phẩm từ body
+    console.log(req.body);
+    const { name, price, description, imageUrl } = req.body; // Lấy thông tin sản phẩm từ body
 
     try {
-        const newProduct = await Product.create({ name, price, description });
+        const newProduct = await Product.create({ name, price, description, imageUrl,timeStamp: moment().tz('Asia/Bangkok').toDate() });
         return res.status(201).json({ message: "Product created successfully", productId: newProduct.id });
     } catch (error) {
         console.error("Error creating product:", error);
@@ -34,7 +35,7 @@ export const getProduct = async (req, res) => {
 // Chỉnh sửa thông tin sản phẩm theo ID
 export const updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { name, price, description } = req.body;
+    const { name, price, description, imageUrl } = req.body;
 
     try {
         const product = await Product.findByPk(id);
@@ -45,6 +46,9 @@ export const updateProduct = async (req, res) => {
         product.name = name || product.name;
         product.price = price || product.price;
         product.description = description || product.description;
+        product.imageUrl = imageUrl || product.imageUrl;
+        product.updatedAt = moment().tz('Asia/Bangkok').toDate(); // Cập nhật thời gian theo giờ Việt Nam
+        product.timeStamp = moment().tz('Asia/Bangkok').toDate();
         await product.save();
 
         return res.status(200).json({ message: "Product updated successfully", product });

@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng
+import moment from 'moment-timezone';
 
 const Product = sequelize.define('Product', {
     name: {
@@ -16,8 +17,33 @@ const Product = sequelize.define('Product', {
     },
     imageUrl: {
         type: DataTypes.STRING,
-        allowNull: false, // Đảm bảo trường này không được null
+        allowNull: false, 
     },
+    createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+            return moment(this.getDataValue('createdAt')).tz('Asia/Bangkok').format();
+        }
+    },updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+            return moment(this.getDataValue('updatedAt')).tz('Asia/Bangkok').format();
+        }
+    },
+    timeStamp: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        get() {
+            return moment(this.getDataValue('timeStamp')).tz('Asia/Bangkok').format();
+        }
+    }
+}, {
+    sequelize, // instance of Sequelize
+    modelName: 'Product',
+    tableName: 'products',
+    timestamps: true, // Enable timestamps
 });
 
 export default Product;

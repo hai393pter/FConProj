@@ -29,4 +29,4 @@ const Product = sequelize.define('Product', {
 // Kết nối đến database và đồng bộ các models
 sequelize.sync();
 
-module.exports = { User, Product };
+export default   {User, Product};

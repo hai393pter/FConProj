@@ -31,6 +31,11 @@ const router = express.Router();
  *               description:
  *                 type: string
  *                 description: A description of the product
+ *               imageUrl:
+ *                 type: string
+ *                 description: Url to image
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -43,7 +48,7 @@ router.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
 // Kiểm tra thông tin sản phẩm theo ID
 /**
  * @openapi
- * /products/:id:
+ * /products/{id}:
  *   get:
  *     tags:
  *       - Products
@@ -56,6 +61,8 @@ router.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
  *         description: The ID of the product
  *         schema:
  *           type: integer
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       200:
  *         description: Product information retrieved successfully
@@ -85,7 +92,7 @@ router.get('/:id', productsControllers.getProduct);
 
 /**
  * @openapi
- * /products/:id:
+ * /products/{id}:
  *   put:
  *     tags:
  *       - Products
@@ -114,6 +121,11 @@ router.get('/:id', productsControllers.getProduct);
  *               description:
  *                 type: string
  *                 description: A description of the product
+ *               imageUrl:
+ *                 type: string
+ *                 description: Image URL
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       200:
  *         description: Product updated successfully

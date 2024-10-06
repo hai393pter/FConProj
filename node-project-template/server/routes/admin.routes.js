@@ -2,7 +2,7 @@ import express from 'express';
 import adminControllers from '../Controllers/admin.controllers.js'; // Ensure this path is correct
 import checkAuth from '../middlewares/checkAuth.middleware.js'; // If you want to protect some routes
 
-const router = express.Router();
+const adminRouter = express.Router();
 
 // Register admin
 /**
@@ -35,7 +35,7 @@ const router = express.Router();
  *       400:
  *         description: Bad request
  */
-router.post('/register', adminControllers.registerAdmin);
+adminRouter.post('/register', adminControllers.registerAdmin);
 
 // Login admin
 /**
@@ -63,7 +63,7 @@ router.post('/register', adminControllers.registerAdmin);
  *       400:
  *         description: Invalid credentials
  */
-router.post('/login', adminControllers.loginAdmin);
+adminRouter.post('/login', adminControllers.loginAdmin);
 
 // Get current logged-in admin info
 /**
@@ -82,7 +82,7 @@ router.post('/login', adminControllers.loginAdmin);
  *       404:
  *         description: Admin not found
  */
-router.get('/me', checkAuth, adminControllers.getMe);
+adminRouter.get('/me', checkAuth, adminControllers.getMe);
 
 // Export router
-export default router;
+export default adminRouter;

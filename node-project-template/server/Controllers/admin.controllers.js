@@ -49,7 +49,7 @@ export const loginAdmin = async (req, res) => {
     console.log('Hashed password in DB:', admin.password_hash);
 
     // Check if password matches
-    const isMatch = await bcrypt.compare(password, admin.password_hash);
+    const isMatch = await Admin.checkPassword(password, admin.password_hash);
     if (!isMatch) {
       console.log('Password does not match');
       return res.status(400).json({ message: 'Invalid credentials' });

@@ -4,7 +4,7 @@ import checkAuth from '../middlewares/checkAuth.middleware.js'; // Nếu bạn m
 import routers from './users.routes.js';
 import checkImageUrl from '../middlewares/checkImageUrl.middleware.js';
 
-const router = express.Router();
+const productRouter = express.Router();
 
 // Tạo sản phẩm mới
 /**
@@ -43,7 +43,7 @@ const router = express.Router();
  *         description: Bad request, validation error
  */
 
-router.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
+productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
 
 // Kiểm tra thông tin sản phẩm theo ID
 /**
@@ -86,7 +86,7 @@ router.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
  *       404:
  *         description: Product not found
  */
-router.get('/:id', productsControllers.getProduct);
+productRouter.get('/:id', productsControllers.getProduct);
 
 // Chỉnh sửa thông tin sản phẩm theo ID
 
@@ -134,7 +134,7 @@ router.get('/:id', productsControllers.getProduct);
  *       400:
  *         description: Bad request, validation error
  */
-router.put('/:id', checkAuth,checkImageUrl, productsControllers.updateProduct);
+productRouter.put('/:id', checkAuth,checkImageUrl, productsControllers.updateProduct);
 
 // Xuất router
-export default router;
+export default productRouter;

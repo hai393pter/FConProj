@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../database';
-import User from './userModel'
+import sequelize from '../database.js';
+import User from './userModel.js'
 class Cart extends Model {}
 
 Cart.init({

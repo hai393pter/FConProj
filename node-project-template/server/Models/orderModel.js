@@ -1,7 +1,6 @@
-// ordermodel.js
+
 import { Model } from 'sequelize';
 import sequelize from '../database';
-import User from './userModel'
 class Order extends Model {}
 
 Order.init({

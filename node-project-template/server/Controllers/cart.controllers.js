@@ -1,99 +1,97 @@
-// controllers/carts.controller.js
+import dotenv from 'dotenv';
+dotenv.config();
+import Cart from '../Models/cartModel.js'; 
+import User from '../Models/userModel.js'; 
 
-import Cart from '../../../Models/cartModel'; // Giả định đã có model Cart
-import Product from '../../../Models/productModel'; // Giả định đã có model Product
 
+// Create a new cart
+export const createCart = async (req, res) => {
+  const { userId } = req.body;
 
-// Lấy danh sách sản phẩm trong giỏ hàng của người dùng
-exports.getCartItems = async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        const cart = await Cart.findOne({ userId }).populate('items.product');
-        if (!cart) {
-            return res.status(404).json({ message: 'Giỏ hàng không tồn tại' });
-        }
-        res.status(200).json(cart);
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi lấy giỏ hàng', error });
+  try {
+    // Validate user existence
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    // Create a new cart
+    const newCart = await Cart.create({ userId });
+
+    return res.status(201).json({ message: 'Cart created successfully', cartId: newCart.id });
+  } catch (error) {
+    console.error('Error creating cart:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
-// Thêm sản phẩm vào giỏ hàng
-exports.addToCart = async (req, res) => {
-    try {
-        const { productId, quantity } = req.body;
-        const userId = req.params.userId;
+// Get a user's cart
+export const getCart = async (req, res) => {
+  const { userId } = req.params; // Expect userId as a route parameter
 
-        // Tìm sản phẩm
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
-        }
+  try {
+    // Find the user's cart
+    const cart = await Cart.findOne({ where: { userId } });
 
-        // Tìm giỏ hàng
-        let cart = await Cart.findOne({ userId });
-        if (!cart) {
-            // Nếu chưa có giỏ hàng, tạo mới
-            cart = new Cart({ userId, items: [] });
-        }
-
-        // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-        const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-        if (cartItemIndex > -1) {
-            // Nếu có, cập nhật số lượng
-            cart.items[cartItemIndex].quantity += quantity;
-        } else {
-            // Nếu chưa, thêm sản phẩm vào giỏ hàng
-            cart.items.push({ product: productId, quantity });
-        }
-
-        await cart.save();
-        res.status(200).json({ message: 'Thêm sản phẩm vào giỏ hàng thành công', cart });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi thêm sản phẩm vào giỏ hàng', error });
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
     }
+
+    return res.status(200).json(cart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
-// Xóa sản phẩm khỏi giỏ hàng
-exports.removeFromCart = async (req, res) => {
-    try {
-        const { userId, productId } = req.params;
+// Update a cart (add items, etc.)
+export const updateCart = async (req, res) => {
+  const { cartId } = req.params; // Expect cartId as a route parameter
+  const { items } = req.body; // Expect items array to update the cart
 
-        let cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.status(404).json({ message: 'Giỏ hàng không tồn tại' });
-        }
-
-        cart.items = cart.items.filter(item => item.product.toString() !== productId);
-
-        await cart.save();
-        res.status(200).json({ message: 'Xóa sản phẩm khỏi giỏ hàng thành công', cart });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi xóa sản phẩm khỏi giỏ hàng', error });
+  try {
+    // Find the cart by id
+    const cart = await Cart.findByPk(cartId);
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
     }
+
+    // Update cart items (Assuming you have an 'items' field in the Cart model)
+    // Here you can implement logic to add/remove items
+    cart.items = items; // Update with new items (you should implement the actual logic here)
+
+    await cart.save();
+
+    return res.status(200).json({ message: 'Cart updated successfully', cart });
+  } catch (error) {
+    console.error('Error updating cart:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
-// Cập nhật số lượng sản phẩm trong giỏ hàng
-exports.updateCartItem = async (req, res) => {
-    try {
-        const { userId, productId } = req.params;
-        const { quantity } = req.body;
+// Delete a cart
+export const deleteCart = async (req, res) => {
+  const { cartId } = req.params; // Expect cartId as a route parameter
 
-        let cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.status(404).json({ message: 'Giỏ hàng không tồn tại' });
-        }
-
-        const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-        if (cartItemIndex > -1) {
-            cart.items[cartItemIndex].quantity = quantity;
-        } else {
-            return res.status(404).json({ message: 'Sản phẩm không tồn tại trong giỏ hàng' });
-        }
-
-        await cart.save();
-        res.status(200).json({ message: 'Cập nhật sản phẩm trong giỏ hàng thành công', cart });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi cập nhật sản phẩm trong giỏ hàng', error });
+  try {
+    const cart = await Cart.findByPk(cartId);
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
     }
+
+    await cart.destroy(); // Deletes the cart
+
+    return res.status(204).json(); // No content to return after deletion
+  } catch (error) {
+    console.error('Error deleting cart:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Export all controllers
+export default {
+  createCart,
+  getCart,
+  updateCart,
+  deleteCart,
 };

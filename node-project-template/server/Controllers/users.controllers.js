@@ -33,6 +33,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body; // Ensure email and password are sent in the request body
 
     try {
+        console.log('Login request received'); 
         const user = await User.findOne({ where: { email } });
 
         if (!user) {

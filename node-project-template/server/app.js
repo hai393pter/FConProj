@@ -8,8 +8,9 @@ import swaggerDocs from './swagger.js';
 import usersRouter from './routes/users.routes.js';
 import adminRouter from './routes/admin.routes.js';
 import productRouter from './routes/products.routes.js';
-import ApplicationConfig from './config/config.js';
 import cartRouter from './routes/carts.routes.js';
+import ApplicationConfig from './config/config.js';
+
 
 // Express App Setup
 const app = express();
@@ -24,10 +25,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/products', productRouter);
-app.use('/carts', cartRouter);
+app.use('/cartitems', cartRouter);
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {
+    console.log(`Request Method: ${req.method}, Request URL: ${req.originalUrl}`);
     res.status(404).json({
         message: "No such route exists"
     });

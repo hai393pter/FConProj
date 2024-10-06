@@ -13,21 +13,11 @@ const cartRouter = express.Router();
  * @openapi
  * /carts:
  *   post:
- *     summary: Create a new cart
+ *     summary: Tạo giỏ hàng mới
  *     tags: [Cart]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: integer
- *                 example: 1
  *     responses:
  *       201:
- *         description: Cart created successfully
+ *         description: Giỏ hàng đã được tạo
  *         content:
  *           application/json:
  *             schema:

@@ -6,6 +6,7 @@ import User from '../Models/userModel.js';
 
 // Create a new cart
 export const createCart = async (req, res) => {
+    console.log('Request to create cart received'); 
   const { userId } = req.body;
 
   try {

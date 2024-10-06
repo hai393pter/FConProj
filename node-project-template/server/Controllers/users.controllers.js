@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import bcrypt from 'bcrypt';
-//require("../Node.Js-sample-project-structure/node_modules/dotenv").config();
 import jwt from 'jsonwebtoken';
 import User from '../Models/userModel.js';
 

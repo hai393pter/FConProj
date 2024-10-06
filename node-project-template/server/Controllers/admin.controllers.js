@@ -1,147 +1,95 @@
-import { config } from 'dotenv';
-config();
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import admin from '../Models/admin.js'
+import Admin from '../Models/admin.js'; // Ensure correct path
+import dotenv from 'dotenv';
+dotenv.config();
 
+// Register a new admin
+export const registerAdmin = async (req, res) => {
+  const { username, email, password } = req.body;
 
+  try {
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({ where: { email } });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'Admin already exists' });
+      
+    }
 
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-export const adminRegister = (req, res, next) => {
-	Admin.find({ email: req.body.email })
-		.exec()
-		.then((admin) => {
-			if (admin.length >= 1) {
-        res.status(409).json({
-          message:"Email Exists"
-        })
-			} else {
-				bcrypt.hash(req.body.password, 10, (err, hash) => {
-					if (err) {
-						return res.status(500).json({
-							error: err,
-						});
-					} else {
-						const admin = new Admin({
-							_id: new mongoose.Types.ObjectId(),
-							email: req.body.email,
-							password: hash,
-              name: req.body.name,
-              phone_number: req.body.phone_number
-						});
-						admin
-							.save()
-							.then(async (result) => {
-								await result
-									.save()
-									.then((result1) => {
-                      console.log(`admin created ${result}`)
-                      res.status(201).json({
-                        adminDetails: {
-                          adminId: result._id,
-                          email: result.email,
-                          name: result.name,
-                          phone_number: result.phone_number,
-                        },
-                      })
-									})
-									.catch((err) => {
-                    console.log(err)
-                    res.status(400).json({
-                      message: err.toString()
-                    })
-									});
-							})
-							.catch((err) => {
-                console.log(err)
-                res.status(500).json({
-                  message: err.toString()
-                })
-							});
-					}
-				});
-			}
-		})
-		.catch((err) => {
-      console.log(err)
-      res.status(500).json({
-        message: err.toString()
-      })
+    // Create a new admin
+    const newAdmin = await Admin.create({
+      username,
+      email,
+      password_hash: hashedPassword,
     });
-}
 
+    return res.status(201).json({ message: 'Admin registered successfully', adminId: newAdmin.id });
+  } catch (error) {
+    console.error('Error registering admin:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
-export const adminLogin = (req, res, next) => {
-	Admin.find({ email: req.body.email })
-		.exec()
-		.then((admin) => {
-      console.log(admin)
-			if (admin.length < 1) {
-				return res.status(401).json({
-					message: "Auth failed: Email not found probably",
-				});
-			}
-			bcrypt.compare(req.body.password, admin[0].password, (err, result) => {
-				if (err) {
-          console.log(err)
-					return res.status(401).json({
-						message: "Auth failed",
-					});
-				}
-				if (result) {
-					const token = jwt.sign(
-						{
-              adminId: admin[0]._id,
-							email: admin[0].email,
-							name: admin[0].name,
-							phone_number: admin[0].phone_number,
-						},
-						process.env.jwtSecret,
-						{
-							expiresIn: "1d",
-						}
-          );
-          console.log(admin[0])
-					return res.status(200).json({
-						message: "Auth successful",
-						adminDetails: {
-							adminId: admin[0]._id,
-							name: admin[0].name,
-							email: admin[0].email,
-							phone_number: admin[0].phone_number,
-						},
-						token: token,
-					});
-				}
-				res.status(401).json({
-					message: "Auth failed1",
-				});
-			});
-		})
-		.catch((err) => {
-			res.status(500).json({
-				error: err,
-			});
-		});
-}
+// Login an admin
+export const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
 
+  try {
+    // Find admin by email
+    const admin = await Admin.findOne({ where: { email } });
+    if (!admin) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    console.log('Password provided by user:', password);
+    console.log('Hashed password in DB:', admin.password_hash);
+
+    // Check if password matches
+    const isMatch = await bcrypt.compare(password, admin.password_hash);
+    if (!isMatch) {
+      console.log('Password does not match');
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: admin.id, username: admin.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // Token expiration time
+    );
+
+    return res.status(200).json({ token, message: 'Login successful' });
+  } catch (error) {
+    console.error('Error logging in admin:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get current logged-in admin info (getMe)
 export const getMe = async (req, res) => {
-	const adminId = req.admin.adminId;
-	const admin = await Admin.findById(adminId);
-	if (admin) {
-		res.status(200).json({
-			message: "Found",
-			admin,
-		});
-	} else {
-		res.status(400).json({
-			message: "Bad request",
-		});
-	}
+  try {
+    // `req.admin` will be available if the user is authenticated
+    const admin = await Admin.findByPk(req.admin.id);
+
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    return res.status(200).json({
+      id: admin.id,
+      username: admin.username,
+      email: admin.email,
+      role: admin.role, // Assuming you have a 'role' field in the admin model
+    });
+  } catch (error) {
+    console.error('Error fetching admin info:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
-export default{
-  adminLogin,
-  adminRegister,
-	getMe,
-};
+// Export all controllers
+export default { registerAdmin, loginAdmin, getMe };

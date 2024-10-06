@@ -1,18 +1,75 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import { DataTypes, Model } from 'sequelize';
+import bcrypt from 'bcrypt';
+import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng đến file cấu hình database
 
+class Admin extends Model {
+  // Phương thức để kiểm tra mật khẩu đã băm
+  static async checkPassword(inputPassword, storedPasswordHash) {
+    return await bcrypt.compare(inputPassword, storedPasswordHash);
+  }
+}
 
-const adminSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  name: String,
-  email: {
-    type: String,
-    lowercase: true,
-    match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
+Admin.init(
+  {
+    // Định nghĩa các cột trong bảng
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    password_hash: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true
+      }
+    },
+    role: {
+      type: DataTypes.ENUM('admin', 'superadmin'),
+      defaultValue: 'admin'
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false
+    }
   },
-  password: String,
-  phone_number: Number,
-});
+  {
+    sequelize,
+    modelName: 'Admin',
+    tableName: 'admins', // Tên bảng trong cơ sở dữ liệu
+    hooks: {
+      // Hook trước khi lưu admin, mã hóa mật khẩu
+      beforeCreate: async (admin) => {
+        if (admin.password_hash) {
+          const salt = await bcrypt.genSalt(10);
+          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
+        }
+      },
+      beforeUpdate: async (admin) => {
+        if (admin.password_hash) {
+          const salt = await bcrypt.genSalt(10);
+          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
+        }
+      }
+    }
+  }
+);
 
-// Export using ES module syntax
-export default mongoose.model("admin", adminSchema);
+export default Admin;

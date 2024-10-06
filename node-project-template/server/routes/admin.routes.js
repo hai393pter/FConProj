@@ -1,10 +1,88 @@
 import express from 'express';
-import checkAuth from '../middlewares/checkAuth.middleware.js';
-import adminControllers from '../Controllers/admin.controllers.js';
-const routers = express.Router();
+import adminControllers from '../Controllers/admin.controllers.js'; // Ensure this path is correct
+import checkAuth from '../middlewares/checkAuth.middleware.js'; // If you want to protect some routes
 
-routers.post('/signup', adminControllers.adminRegister);
-routers.post('/login', adminControllers.adminLogin);
-routers.get('/me', checkAuth, adminControllers.getMe);
+const router = express.Router();
 
-export default routers;
+// Register admin
+/**
+ * @openapi
+ * /admin/register:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Register Admin
+ *     description: Admin registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The admin's username. *
+ *               email:
+ *                 type: string
+ *                 description: The admin's email. *
+ *               password:
+ *                 type: string
+ *                 description: The admin's password. *
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully
+ *       400:
+ *         description: Bad request
+ */
+router.post('/register', adminControllers.registerAdmin);
+
+// Login admin
+/**
+ * @openapi
+ * /admin/login:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Login Admin
+ *     description: Admin login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Admin logged in successfully
+ *       400:
+ *         description: Invalid credentials
+ */
+router.post('/login', adminControllers.loginAdmin);
+
+// Get current logged-in admin info
+/**
+ * @openapi
+ * /admin/me:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get current admin info
+ *     description: Retrieve the current logged-in admin's information
+ *     security:
+ *      - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin information retrieved successfully
+ *       404:
+ *         description: Admin not found
+ */
+router.get('/me', checkAuth, adminControllers.getMe);
+
+// Export router
+export default router;

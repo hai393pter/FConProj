@@ -117,7 +117,14 @@ cartRouter.post('/add', addProductToCart);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Cart'
+ *             type: object
+ *             properties:
+ *               product_id:
+ *                 type: integer
+ *                 example: 101
+ *               quantity:
+ *                 type: integer
+ *                 example: 3
  *     responses:
  *       200:
  *         description: Giỏ hàng đã được cập nhật!

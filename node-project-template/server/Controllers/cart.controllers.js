@@ -86,7 +86,7 @@ export const addProductToCart = async (req, res) => {
 // Update a cart (add items, etc.)
 export const updateCart = async (req, res) => {
   const { cartId } = req.params; // Expect cartId as a route parameter
-  const { items } = req.body; // Expect items array to update the cart
+  const items = req.body; // Expect items array to update the cart
 
   try {
     // Find the cart by id
@@ -94,14 +94,17 @@ export const updateCart = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
     }
-
     // Update cart items (Assuming you have an 'items' field in the Cart model)
     // Here you can implement logic to add/remove items
     cart.items = items; // Update with new items (you should implement the actual logic here)
+    
+    console.log(items);
+    const result = await cart.update({
+      quantity: items.quantity,
+      product_id: items.product_id
+    });
 
-    await cart.save();
-
-    return res.status(200).json({ message: 'Giỏ hàng đã được cập nhật', cart });
+    return res.status(200).json({ message: 'Giỏ hàng đã được cập nhật', result });
   } catch (error) {
     console.error('Có lỗi khi cập nhật giỏ hàng', error);
     return res.status(500).json({ message: 'Server error', error: error.message });

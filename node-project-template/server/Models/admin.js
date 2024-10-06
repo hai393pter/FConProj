@@ -4,9 +4,6 @@ import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng �
 
 class Admin extends Model {
   // Phương thức để kiểm tra mật khẩu đã băm
-  static async checkPassword(inputPassword, storedPasswordHash) {
-    return await bcrypt.compare(inputPassword, storedPasswordHash);
-  }
 }
 
 Admin.init(

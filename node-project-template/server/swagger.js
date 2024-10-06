@@ -1,7 +1,5 @@
 // swagger.js
 import swaggerJsDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import swaggerAutogen from 'swagger-autogen';
 import express from 'express';
 
 const app = express();

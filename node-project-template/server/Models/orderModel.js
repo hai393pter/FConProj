@@ -1,39 +1,49 @@
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../database.js';
 
-import { Model } from 'sequelize';
-import sequelize from '../database';
 class Order extends Model {}
 
-Order.init({
+Order.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
     },
-    userId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: User,
-            key: 'id'
-        },
-        allowNull: false,
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
-    totalPrice: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
+    total_price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     status: {
-        type: DataTypes.STRING,
-        defaultValue: 'Pending',
+      type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
+      defaultValue: 'pending',
+    },
+    order_date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
-}, {
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
+  },
+  {
     sequelize,
     modelName: 'Order',
     tableName: 'orders',
-    timestamps: false,
-});
+  }
+);
 
 export default Order;

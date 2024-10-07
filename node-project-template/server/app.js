@@ -10,6 +10,7 @@ import adminRouter from './routes/admin.routes.js';
 import productRouter from './routes/products.routes.js';
 import cartRouter from './routes/carts.routes.js';
 import ApplicationConfig from './config/config.js';
+import orderRouter from './routes/order.routes.js';
 
 
 // Express App Setup
@@ -26,6 +27,7 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/products', productRouter);
 app.use('/cartitems', cartRouter);
+app.use('/orders',orderRouter);
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {

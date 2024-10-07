@@ -1,4 +1,5 @@
-import bcrypt from 'bcrypt';
+
+import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Admin from '../Models/admin.js'; // Ensure correct path
 import dotenv from 'dotenv';
@@ -11,14 +12,18 @@ export const registerAdmin = async (req, res) => {
   try {
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ where: { email } });
+    console.log(existingAdmin);
     if (existingAdmin) {
       return res.status(400).json({ message: 'Admin already exists' });
       
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await argon2.hash(password);
+
+    console.log('Plain Password:', password);
+    console.log('Hashed Password:', hashedPassword);
+
 
     // Create a new admin
     const newAdmin = await Admin.create({
@@ -41,12 +46,20 @@ export const loginAdmin = async (req, res) => {
   try {
     // Find admin by email
     const admin = await Admin.findOne({ where: { email } });
+   
     if (!admin) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     console.log('Password provided by user:', password);
     console.log('Hashed password in DB:', admin.password_hash);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: admin.id, username: admin.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // Token expiration time
+    );
 
     // Check if password matches
     const isMatch = await Admin.checkPassword(password, admin.password_hash);
@@ -55,12 +68,6 @@ export const loginAdmin = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: admin.id, username: admin.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' } // Token expiration time
-    );
 
     return res.status(200).json({ token, message: 'Login successful' });
   } catch (error) {

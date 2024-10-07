@@ -1,9 +1,13 @@
 import { DataTypes, Model } from 'sequelize';
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng đến file cấu hình database
 
 class Admin extends Model {
-  // Phương thức để kiểm tra mật khẩu đã băm
+  // Method to check password using bcrypt
+  static async checkPassword(password, hashedPassword) {
+    return await argon2.verify(hashedPassword, password);
+
+  }
 }
 
 Admin.init(
@@ -52,17 +56,16 @@ Admin.init(
     modelName: 'Admin',
     tableName: 'admins', // Tên bảng trong cơ sở dữ liệu
     hooks: {
-      // Hook trước khi lưu admin, mã hóa mật khẩu
+      // Hook before creating a new admin (hash password only if it's not already hashed)
       beforeCreate: async (admin) => {
-        if (admin.password_hash) {
-          const salt = await bcrypt.genSalt(10);
-          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
+        if (admin.password_hash && !admin.password_hash.startsWith('$argon2')) {
+          admin.password_hash = await argon2.hash(admin.password_hash);
         }
       },
+      // Hook before updating an existing admin (hash password only if it's not already hashed)
       beforeUpdate: async (admin) => {
-        if (admin.password_hash) {
-          const salt = await bcrypt.genSalt(10);
-          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
+        if (admin.password_hash && !admin.password_hash.startsWith('$argon2')) {
+          admin.password_hash = await argon2.hash(admin.password_hash);
         }
       }
     }

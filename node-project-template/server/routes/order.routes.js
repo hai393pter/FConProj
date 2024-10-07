@@ -8,7 +8,7 @@ const orderRouter = express.Router();
  * @openapi
  * /orders:
  *   post:
- *     summary: Create a new order
+ *     summary: Tạo đơn hàng mới 
  *     tags: 
  *       - Orders
  *     requestBody:
@@ -22,7 +22,7 @@ const orderRouter = express.Router();
  *                 type: integer
  *     responses:
  *       201:
- *         description: Order created successfully
+ *         description: Đơn hàng đã được tạo
  *         content:
  *           application/json:
  *             schema:
@@ -37,7 +37,7 @@ orderRouter.post('/', createOrder);
  * @openapi
  * /orders/{user_id}:
  *   get:
- *     summary: Get all orders for a specific user
+ *     summary: Lấy tất cả đơn hàng
  *     tags:
  *       - Orders
  *     parameters:
@@ -46,10 +46,10 @@ orderRouter.post('/', createOrder);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the user
+ *         description: Mã người dùng
  *     responses:
  *       200:
- *         description: List of user orders
+ *         description: Danh sách đơn hàng
  *         content:
  *           application/json:
  *             schema:
@@ -57,7 +57,7 @@ orderRouter.post('/', createOrder);
  *               items:
  *                 $ref: '#/components/schemas/Order'
  *       404:
- *         description: No orders found for user
+ *         description: Không tìm thấy đơn hàng của người dùng hiện tại
  *       500:
  *         description: Server error
  */
@@ -68,7 +68,7 @@ orderRouter.get('/:user_id', getUserOrders);
  * @openapi
  * /orders/{order_id}:
  *   put:
- *     summary: Update the status of an order
+ *     summary: Cập nhật tình trạng đơn hàng
  *     tags:
  *       - Orders
  *     parameters:
@@ -77,7 +77,7 @@ orderRouter.get('/:user_id', getUserOrders);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the order
+ *         description: Mã đơn hàng
  *     requestBody:
  *       required: true
  *       content:
@@ -90,9 +90,9 @@ orderRouter.get('/:user_id', getUserOrders);
  *                 enum: [pending, shipped, delivered, cancelled]
  *     responses:
  *       200:
- *         description: Order status updated successfully
+ *         description: Đã cập nhật tình trạng đơn hàng
  *       404:
- *         description: Order not found
+ *         description: Không tìm thấy đơn hàng
  *       500:
  *         description: Server error
  */

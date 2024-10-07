@@ -5,12 +5,16 @@ import sequelize from '../database.js';
 class CareSchedule extends Model {}
 
 CareSchedule.init({
+    user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
-    plant_id: {
+    product_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

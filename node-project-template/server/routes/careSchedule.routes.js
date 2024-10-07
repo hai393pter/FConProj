@@ -12,11 +12,6 @@ const careRouter = express.Router();
 
 /**
  * @openapi
- * openapi: 3.0.0
- * info:
- *   title: Lịch chăm sóc cây
- *   version: 1.0.0
- *   description: Lịch chăm sóc cây
  * 
  * components:
  *   schemas:
@@ -47,6 +42,8 @@ const careRouter = express.Router();
  *   /careschedules:
  *     post:
  *       summary: Tạo lịch mới
+ *       tags:
+ *          - Care Schedule
  *       requestBody:
  *         required: true
  *         content:
@@ -83,6 +80,8 @@ const careRouter = express.Router();
  *           description: Server error
  *     get:
  *       summary: Xem tất cả lịch
+ *       tags:
+ *         - Care Schedule
  *       responses:
  *         200:
  *           description: Danh sách các lịch chăm sóc
@@ -98,6 +97,8 @@ const careRouter = express.Router();
  *   /careschedules/{id}:
  *     get:
  *       summary: Xem lịch chăm sóc dựa trên mã lịch
+ *       tags:
+ *         - Care Schedule
  *       parameters:
  *         - name: id
  *           in: path
@@ -119,6 +120,8 @@ const careRouter = express.Router();
  * 
  *     put:
  *       summary: Cập nhật lịch chăm sóc theo mã lịch
+ *       tags:
+ *         - Care Schedule
  *       parameters:
  *         - name: id
  *           in: path
@@ -163,6 +166,8 @@ const careRouter = express.Router();
  * 
  *     delete:
  *       summary: Xóa lịch chăm sóc dựa theo mã lịch
+ *       tags:
+ *         - Care Schedule
  *       parameters:
  *         - name: id
  *           in: path

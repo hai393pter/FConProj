@@ -49,6 +49,56 @@ const productRouter = express.Router();
  */
 productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProduct);
 
+/**
+ * @openapi
+ * /products/filter:
+ *   get:
+ *     summary: Filter products based on query parameters
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: The category of the products to filter by
+ *       - in: query
+ *         name: min_price
+ *         schema:
+ *           type: number
+ *           format: float
+ *         description: Minimum price of the products
+ *       - in: query
+ *         name: max_price
+ *         schema:
+ *           type: number
+ *           format: float
+ *         description: Maximum price of the products
+ *     responses:
+ *       200:
+ *         description: A list of filtered products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   price:
+ *                     type: number
+ *                     format: float
+ *                   description:
+ *                     type: string
+ *                   imageUrl:
+ *                     type: string
+ *       500:
+ *         description: Error filtering products
+ */
+productRouter.get('/filter', productsControllers.filterProducts);
+
 // Kiểm tra thông tin sản phẩm theo ID
 /**
  * @openapi
@@ -191,55 +241,7 @@ productRouter.put('/:id', checkAuth,checkImageUrl, productsControllers.updatePro
  *         description: Error fetching products
  */
 productRouter.get('/', productsControllers.getAllProducts);
-/**
- * @openapi
- * /products/filter:
- *   get:
- *     summary: Filter products based on query parameters
- *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: The category of the products to filter by
- *       - in: query
- *         name: min_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Minimum price of the products
- *       - in: query
- *         name: max_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Maximum price of the products
- *     responses:
- *       200:
- *         description: A list of filtered products
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   name:
- *                     type: string
- *                   price:
- *                     type: number
- *                     format: float
- *                   description:
- *                     type: string
- *                   imageUrl:
- *                     type: string
- *       500:
- *         description: Error filtering products
- */
-productRouter.get('/filter', productsControllers.filterProducts);
+
 
 // Xuất router
 export default productRouter;

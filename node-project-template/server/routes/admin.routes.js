@@ -65,24 +65,6 @@ adminRouter.post('/register', adminControllers.registerAdmin);
  */
 adminRouter.post('/login', adminControllers.loginAdmin);
 
-// Get current logged-in admin info
-/**
- * @openapi
- * /admin/me:
- *   get:
- *     tags:
- *       - Admin
- *     summary: Get current admin info
- *     description: Retrieve the current logged-in admin's information
- *     security:
- *      - bearerAuth: []
- *     responses:
- *       200:
- *         description: Admin information retrieved successfully
- *       404:
- *         description: Admin not found
- */
-adminRouter.get('/me', checkAuth, adminControllers.getMe);
 
 // Export router
 export default adminRouter;

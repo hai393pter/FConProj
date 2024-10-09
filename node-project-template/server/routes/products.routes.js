@@ -12,7 +12,7 @@ const productRouter = express.Router();
  *   post:
  *     tags:
  *       - Products
- *     summary: Create a new product
+ *     summary: Tạo sản phẩm mới
  *     requestBody:
  *       required: true
  *       content:
@@ -34,7 +34,7 @@ const productRouter = express.Router();
  *       - bearerAuth: []
  *     responses:
  *       201:
- *         description: Product created successfully
+ *         description: Sản phẩm đã được tạo
  *         content:
  *           application/json:
  *             schema:
@@ -53,7 +53,7 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
  * @openapi
  * /products/filter:
  *   get:
- *     summary: Filter products based on query parameters
+ *     summary: Tìm sản phẩm bằng filter
  *     tags: [Products]
  *     parameters:
  *       - in: query
@@ -95,7 +95,7 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
  *                   imageUrl:
  *                     type: string
  *       500:
- *         description: Error filtering products
+ *         description: Có lỗi khi tìm sản phẩm
  */
 productRouter.get('/filter', productsControllers.filterProducts);
 

@@ -139,14 +139,14 @@ const careRouter = express.Router();
  *                 user_id:
  *                   type: integer
  *                   example: 1
- *                 plant_id:
+ *                 product_id:
  *                   type: integer
  *                   example: 2
- *                 schedule_date:
+ *                 task_date:
  *                   type: string
  *                   format: date-time
  *                   example: "2024-10-10T10:00:00Z"
- *                 task:
+ *                 task_type:
  *                   type: string
  *                   example: "Watering"
  *                 notes:

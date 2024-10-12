@@ -92,38 +92,51 @@ export const updateProduct = async (req, res) => {
     
 };
     // Filter products based on query parameters
-    export const filterProducts = async (req, res) => {
-        try {
-            const { category, min_price, max_price } = req.query;
-    
-            // Build the filter criteria
-            let filter = {};
-            if (category) {
-                filter.category = category; // Filter by category
-            }
-    
-            if (min_price || max_price) {
-                filter.price = {};
-                if (min_price && !isNaN(parseFloat(min_price))) {
-                    filter.price[Op.gte] = parseFloat(min_price); // Greater than or equal to min_price
-                }
-                if (max_price && !isNaN(parseFloat(max_price))) {
-                    filter.price[Op.lte] = parseFloat(max_price); // Less than or equal to max_price
-                }
-            }
-            // Check if filter is empty; if so, fetch all products
-            const products = Object.keys(filter).length
-                ? await Product.findAll({ where: filter })
-                : await Product.findAll(); // No filtering criteria, fetch all
-            console.log(products);
-            
-    
-            return res.status(200).json(products);
-        } catch (error) {
-            console.error('Error filtering products:', error);
-            return res.status(500).json({ message: 'Server error', error: error.message });
+export const filterProducts = async (req, res) => {
+    try {
+        const { category, min_price, max_price, page = 1, limit = 10 } = req.query;
+
+        // Build the filter criteria
+        let filter = {};
+        if (category) {
+            filter.category = category; // Filter by category
         }
-    };
+
+        if (min_price || max_price) {
+            filter.price = {};
+            if (min_price && !isNaN(parseFloat(min_price))) {
+                filter.price[Op.gte] = parseFloat(min_price); // Greater than or equal to min_price
+            }
+            if (max_price && !isNaN(parseFloat(max_price))) {
+                filter.price[Op.lte] = parseFloat(max_price); // Less than or equal to max_price
+            }
+        }
+
+        // Calculate offset for pagination
+        const offset = (page - 1) * limit;
+
+        // Fetch filtered products with pagination
+        const products = await Product.findAll({
+            where: filter,
+            limit: parseInt(limit),
+            offset: parseInt(offset)
+        });
+
+        // Fetch total count for pagination metadata
+        const totalProducts = await Product.count({ where: filter });
+
+        return res.status(200).json({
+            totalProducts,
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: parseInt(page),
+            products
+        });
+    } catch (error) {
+        console.error('Error filtering products:', error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 // Tất cả các hàm
 export default { createProduct, getProduct, updateProduct, filterProducts, getAllProducts };
 

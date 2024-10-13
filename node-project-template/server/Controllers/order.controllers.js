@@ -25,7 +25,7 @@ export const createOrder = async (req, res) => {
       order_date: new Date(), // order date
     });
 
-    return res.status(201).json({ statusCode: 201, data: { message: 'Order created successfully', order } });
+    return res.status(201).json({ statusCode: 200, data: { message: 'Order created successfully', order } });
   } catch (error) {
     console.error('Error creating order:', error);
     return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });

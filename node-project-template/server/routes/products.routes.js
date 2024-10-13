@@ -72,31 +72,53 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
  *           type: number
  *           format: float
  *         description: Maximum price of the products
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number for pagination (default is 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The number of products per page (default is 5)
  *     responses:
  *       200:
  *         description: A list of filtered products
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   name:
- *                     type: string
- *                   price:
- *                     type: number
- *                     format: float
- *                   description:
- *                     type: string
- *                   imageUrl:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                 totalProducts:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 currentPage:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                       description:
+ *                         type: string
+ *                       imageUrl:
+ *                         type: string
  *       500:
  *         description: Có lỗi khi tìm sản phẩm
  */
 productRouter.get('/filter', productsControllers.filterProducts);
+
 
 // Kiểm tra thông tin sản phẩm theo ID
 /**

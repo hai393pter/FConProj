@@ -1,4 +1,3 @@
-
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Admin from '../Models/admin.js'; // Ensure correct path
@@ -14,8 +13,7 @@ export const registerAdmin = async (req, res) => {
     const existingAdmin = await Admin.findOne({ where: { email } });
     console.log(existingAdmin);
     if (existingAdmin) {
-      return res.status(400).json({ message: 'Admin already exists' });
-      
+      return res.status(400).json({ statusCode: 400, message: 'Admin already exists' });
     }
 
     // Hash the password
@@ -24,7 +22,6 @@ export const registerAdmin = async (req, res) => {
     console.log('Plain Password:', password);
     console.log('Hashed Password:', hashedPassword);
 
-
     // Create a new admin
     const newAdmin = await Admin.create({
       username,
@@ -32,10 +29,10 @@ export const registerAdmin = async (req, res) => {
       password_hash: hashedPassword,
     });
 
-    return res.status(201).json({ message: 'Admin registered successfully', adminId: newAdmin.id });
+    return res.status(201).json({ statusCode: 201, message: 'Admin registered successfully', data: { adminId: newAdmin.id } });
   } catch (error) {
     console.error('Error registering admin:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
 
@@ -46,13 +43,20 @@ export const loginAdmin = async (req, res) => {
   try {
     // Find admin by email
     const admin = await Admin.findOne({ where: { email } });
-   
+
     if (!admin) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ statusCode: 400, message: 'Invalid credentials' });
     }
 
     console.log('Password provided by user:', password);
     console.log('Hashed password in DB:', admin.password_hash);
+
+    // Check if password matches
+    const isMatch = await argon2.verify(admin.password_hash, password);
+    if (!isMatch) {
+      console.log('Password does not match');
+      return res.status(400).json({ statusCode: 400, message: 'Invalid credentials' });
+    }
 
     // Generate JWT token
     const token = jwt.sign(
@@ -61,18 +65,10 @@ export const loginAdmin = async (req, res) => {
       { expiresIn: '1h' } // Token expiration time
     );
 
-    // Check if password matches
-    const isMatch = await Admin.checkPassword(password, admin.password_hash);
-    if (!isMatch) {
-      console.log('Password does not match');
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-
-    return res.status(200).json({ token, message: 'Login successful' });
+    return res.status(200).json({ statusCode: 200, token, message: 'Login successful' });
   } catch (error) {
     console.error('Error logging in admin:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
 
@@ -84,10 +80,11 @@ export const getMe = async (req, res) => {
     const admin = await Admin.findByPk(req.admin.id);
 
     if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
+      return res.status(404).json({ statusCode: 404, message: 'Admin not found' });
     }
 
     return res.status(200).json({
+      statusCode: 200,
       id: admin.id,
       username: admin.username,
       email: admin.email,
@@ -95,9 +92,10 @@ export const getMe = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching admin info:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
 */
+
 // Export all controllers
-export default { registerAdmin, loginAdmin/*getMe*/ };
+export default { registerAdmin, loginAdmin /* getMe */ };

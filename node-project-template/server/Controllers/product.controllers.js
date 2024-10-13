@@ -157,13 +157,11 @@ export const filterProducts = async (req, res) => {
         // Calculate offset for pagination
         const offset = (page - 1) * limit;
 
-        console.log (filter);
-
         // Fetch filtered products with pagination
         const data = await Product.findAll({
             where: filter,
-            limit: parseInt(limit),
-            offset: parseInt(offset)
+            limit: parseInt(limit, 10), // Convert limit to integer
+            offset: parseInt(offset, 10)  // Convert offset to integer
         });
 
         // Fetch total count for pagination metadata
@@ -173,8 +171,8 @@ export const filterProducts = async (req, res) => {
             statusCode: 200,
             totalProducts,
             totalPages: Math.ceil(totalProducts / limit),
-            currentPage: parseInt(page),
-            data
+            currentPage: parseInt(page, 10), // Convert currentPage to integer
+            data,
         });
     } catch (error) {
         console.error('Error filtering products:', error);

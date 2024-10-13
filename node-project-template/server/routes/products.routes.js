@@ -163,7 +163,6 @@ productRouter.get('/filter', productsControllers.filterProducts);
  */
 productRouter.get('/:id', productsControllers.getProduct);
 
-// Chỉnh sửa thông tin sản phẩm theo ID
 /**
  * @openapi
  * /products/update:
@@ -208,6 +207,7 @@ productRouter.get('/:id', productsControllers.getProduct);
  *         description: Bad request, validation error
  */
 productRouter.put('/update', checkAuth, checkImageUrl, productsControllers.updateProduct);
+
 
 /**
  * @openapi

@@ -29,7 +29,7 @@ export const registerAdmin = async (req, res) => {
       password_hash: hashedPassword,
     });
 
-    return res.status(201).json({ statusCode: 201, message: 'Admin registered successfully', data: { adminId: newAdmin.id } });
+    return res.status(200).json({ statusCode: 200, message: 'Admin registered successfully', data: { adminId: newAdmin.id } });
   } catch (error) {
     console.error('Error registering admin:', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });

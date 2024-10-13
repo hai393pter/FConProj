@@ -16,8 +16,8 @@ export const createProduct = async (req, res) => {
             imageUrl, 
             timeStamp: moment().tz('Asia/Bangkok').toDate() 
         });
-        return res.status(201).json({ 
-            statusCode: 201, 
+        return res.status(200).json({ 
+            statusCode: 200, 
             message: "Product created successfully", 
             productId: newProduct.id 
         });

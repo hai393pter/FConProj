@@ -16,7 +16,7 @@ export const createCareSchedule = async (req, res) => {
       notes
     });
 
-    res.status(201).json({ statusCode: 201, message: 'Care schedule created', data: { careSchedule: newCareSchedule } });
+    res.status(200).json({ statusCode: 200, message: 'Care schedule created', data: { careSchedule: newCareSchedule } });
   } catch (error) {
     console.error('Error creating care schedule:', error);
     res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });

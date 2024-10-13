@@ -24,7 +24,7 @@ export const createCart = async (req, res) => {
     const newCart = await Cart.create({ user_id, product_id });
     console.log('Giỏ hàng đã được tạo với mã:', newCart.id);
 
-    return res.status(201).json({ statusCode: 201, message: 'Giỏ hàng đã được tạo thành công', data: { cartId: newCart.id } });
+    return res.status(200).json({ statusCode: 200, message: 'Giỏ hàng đã được tạo thành công', data: { cartId: newCart.id } });
   } catch (error) {
     console.error('Có lỗi khi tạo giỏ hàng:', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
@@ -72,7 +72,7 @@ export const addProductToCart = async (req, res) => {
     } else {
       // Create a new cart item if it doesn't exist
       const newCartItem = await Cart.create({ user_id, product_id, quantity });
-      return res.status(201).json({ statusCode: 201, message: 'Sản phẩm đã được thêm vào giỏ hàng', data: newCartItem });
+      return res.status(200).json({ statusCode: 200, message: 'Sản phẩm đã được thêm vào giỏ hàng', data: newCartItem });
     }
   } catch (error) {
     console.error('Có lỗi khi thêm sản phẩm vào giỏ hàng', error);

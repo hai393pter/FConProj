@@ -16,7 +16,6 @@ export const createPayment = async (req, res) => {
     if (!order) {
       return res.status(404).json({ data: { statusCode: 404, message: 'Order not found' } });
     }
-
     const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const data = {
       vnp_Version: '2.1.0',
@@ -28,7 +27,7 @@ export const createPayment = async (req, res) => {
       vnp_IpAddr: req.ip,
       vnp_Locale: 'vn',
       vnp_OrderInfo: `Thanh toán cho đơn hàng ${order_id}`,
-      vnp_ReturnUrl: 'http://localhost:3000/payment/callback', // Thay đổi URL này theo địa chỉ thực tế
+      vnp_ReturnUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}/payments/callback`,
       vnp_TxnRef: order_id.toString(),
     };
 

@@ -182,7 +182,7 @@ export const filterProducts = async (req, res) => {
                 totalElements,
                 size: limitNumber, // Số lượng sản phẩm trong mỗi trang
                 currentPage: pageNumber,
-                products: data
+                content: data
             }
         });
     } catch (error) {

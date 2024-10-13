@@ -102,7 +102,7 @@ export const updateProduct = async (req, res) => {
 
     try {
         const data = await Product.findByPk(id);
-        if (!product) {
+        if (!data) {
             return res.status(404).json({ 
                 statusCode: 404, 
                 message: "Product not found" 

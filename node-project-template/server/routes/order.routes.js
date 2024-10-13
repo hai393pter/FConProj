@@ -26,7 +26,20 @@ const orderRouter = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Order'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Mã đơn hàng
+ *                 user_id:
+ *                   type: integer
+ *                   description: Mã người dùng
+ *                 status:
+ *                   type: string
+ *                   enum: [pending, shipped, delivered, cancelled]
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
  *       500:
  *         description: Server error
  */
@@ -55,7 +68,20 @@ orderRouter.post('/', createOrder);
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Order'
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: Mã đơn hàng
+ *                   user_id:
+ *                     type: integer
+ *                     description: Mã người dùng
+ *                   status:
+ *                     type: string
+ *                     enum: [pending, shipped, delivered, cancelled]
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
  *       404:
  *         description: Không tìm thấy đơn hàng của người dùng hiện tại
  *       500:

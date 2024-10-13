@@ -4,16 +4,18 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../Models/userModel.js';
 
-
-
 const register = async (req, res) => {
-    const { name, email, password } = req.body; // Ensure to use 'name'
+    const { name, email, password } = req.body;
 
     try {
         // Check if the user already exists
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            return res.status(400).json({ message: "User already exists." });
+            return res.status(400).json({
+                statusCode: 400,
+                message: "User already exists.",
+                data: {}
+            });
         }
 
         // Hash the password
@@ -21,60 +23,104 @@ const register = async (req, res) => {
 
         // Create a new user
         const newUser = await User.create({ name, email, password_hash });
-        return res.status(201).json({ message: "User registered successfully.", userId: newUser.id });
+        return res.status(201).json({
+            statusCode: 201,
+            message: "User registered successfully.",
+            data: { userId: newUser.id }
+        });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error registering user.", error: error.message });
+        return res.status(500).json({
+            statusCode: 500,
+            message: "Error registering user.",
+            data: { error: error.message }
+        });
     }
 };
 
 // Login user
 export const login = async (req, res) => {
-    const { email, password } = req.body; // Ensure email and password are sent in the request body
+    const { email, password } = req.body;
 
     try {
         console.log('Login request received'); 
         const user = await User.findOne({ where: { email } });
 
         if (!user) {
-            return res.status(401).json({ message: "Invalid email or password." });
+            return res.status(401).json({
+                statusCode: 401,
+                message: "Invalid email or password.",
+                data: {}
+            });
         }
 
         // Log the user object to see its contents
         console.log("User found:", user);
 
         // Ensure the password_hash exists
-        const passwordHash = user.password_hash; // Make sure this field exists
+        const passwordHash = user.password_hash; 
         if (!passwordHash) {
-            return res.status(500).json({ message: "User found but no password hash exists." });
+            return res.status(500).json({
+                statusCode: 500,
+                message: "User found but no password hash exists.",
+                data: {}
+            });
         }
 
         const isPasswordValid = await bcrypt.compare(password, passwordHash);
         
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Invalid email or password." });
+            return res.status(401).json({
+                statusCode: 401,
+                message: "Invalid email or password.",
+                data: {}
+            });
         }
 
         // Optionally, generate a token
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        return res.status(200).json({ message: "Login successful", token });
+        return res.status(200).json({
+            statusCode: 200,
+            message: "Login successful",
+            data: { token }
+        });
     } catch (error) {
         console.error("Error logging in:", error);
-        return res.status(500).json({ message: "Error logging in.", error: error.message });
+        return res.status(500).json({
+            statusCode: 500,
+            message: "Error logging in.",
+            data: { error: error.message }
+        });
     }
 };
 
 // Get the currently logged-in user
 const getMe = async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id); // Assuming you're using a middleware to set req.user
+        const user = await User.findByPk(req.user.id); 
         if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({
+                statusCode: 404,
+                message: 'User not found.',
+                data: {}
+            });
         }
 
-        res.status(200).json({ username: user.name, email: user.email, id: user.id });
+        res.status(200).json({
+            statusCode: 200,
+            message: "User information retrieved successfully.",
+            data: {
+                username: user.name,
+                email: user.email,
+                id: user.id
+            }
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching user data.', error: err.message });
+        res.status(500).json({
+            statusCode: 500,
+            message: 'Error fetching user data.',
+            data: { error: err.message }
+        });
     }
 };
 

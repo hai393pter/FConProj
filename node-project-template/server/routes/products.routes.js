@@ -1,7 +1,6 @@
 import express from 'express';
 import productsControllers from '../Controllers/product.controllers.js'; // Đảm bảo rằng đường dẫn đúng
 import checkAuth from '../middlewares/checkAuth.middleware.js'; // Nếu bạn muốn kiểm tra xác thực cho các phương thức này
-import routers from './users.routes.js';
 import checkImageUrl from '../middlewares/checkImageUrl.middleware.js';
 
 const productRouter = express.Router();
@@ -143,22 +142,14 @@ productRouter.get('/filter', productsControllers.filterProducts);
 productRouter.get('/:id', productsControllers.getProduct);
 
 // Chỉnh sửa thông tin sản phẩm theo ID
-
 /**
  * @openapi
- * /products/{id}:
+ * /products/update:
  *   put:
  *     tags:
  *       - Products
  *     summary: Chỉnh sửa thông tin sản phẩm theo ID
  *     description: Update product information by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The ID of the product
- *         schema:
- *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -166,6 +157,9 @@ productRouter.get('/:id', productsControllers.getProduct);
  *           schema:
  *             type: object
  *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: The ID of the product
  *               name:
  *                 type: string
  *                 description: The name of the product
@@ -191,31 +185,14 @@ productRouter.get('/:id', productsControllers.getProduct);
  *       400:
  *         description: Bad request, validation error
  */
-productRouter.put('/:id', checkAuth,checkImageUrl, productsControllers.updateProduct);
+productRouter.put('/update', checkAuth, checkImageUrl, productsControllers.updateProduct);
+
 /**
  * @openapi
  * /products:
  *   get:
  *     summary: Retrieve all products
  *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: The category of the products to filter by
- *       - in: query
- *         name: min_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Minimum price of the products
- *       - in: query
- *         name: max_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Maximum price of the products
  *     responses:
  *       200:
  *         description: A list of products
@@ -241,7 +218,6 @@ productRouter.put('/:id', checkAuth,checkImageUrl, productsControllers.updatePro
  *         description: Error fetching products
  */
 productRouter.get('/', productsControllers.getAllProducts);
-
 
 // Xuất router
 export default productRouter;

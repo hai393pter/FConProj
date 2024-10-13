@@ -12,6 +12,7 @@ import cartRouter from './routes/carts.routes.js';
 import ApplicationConfig from './config/config.js';
 import orderRouter from './routes/order.routes.js';
 import careRouter from './routes/careSchedule.routes.js';
+import paymentsRouter from './routes/payments.routes.js';
 
 
 // Express App Setup
@@ -30,6 +31,7 @@ app.use('/products', productRouter);
 app.use('/cartitems', cartRouter);
 app.use('/orders',orderRouter);
 app.use('/careschedules', careRouter);
+app.use('/payments', paymentsRouter);
 
 
 // Catch 404 and forward to error handler

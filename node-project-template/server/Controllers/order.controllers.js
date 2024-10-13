@@ -11,7 +11,7 @@ export const createOrder = async (req, res) => {
     const cartItems = await Cart.findAll({ where: { user_id }, include: [Product] });
 
     if (!cartItems.length) {
-      return res.status(400).json({ message: 'Cart is empty' });
+      return res.status(400).json({ statusCode: 400, data: { message: 'Cart is empty' } });
     }
 
     // Calculate total price
@@ -25,10 +25,10 @@ export const createOrder = async (req, res) => {
       order_date: new Date(), // order date
     });
 
-    return res.status(201).json({ message: 'Order created successfully', order });
+    return res.status(201).json({ statusCode: 201, data: { message: 'Order created successfully', order } });
   } catch (error) {
     console.error('Error creating order:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
   }
 };
 
@@ -39,12 +39,12 @@ export const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({ where: { user_id } });
     if (!orders.length) {
-      return res.status(404).json({ message: 'No orders found for the user' });
+      return res.status(404).json({ statusCode: 404, data: { message: 'No orders found for the user' } });
     }
-    return res.status(200).json(orders);
+    return res.status(200).json({ statusCode: 200, data: orders });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
   }
 };
 
@@ -57,21 +57,21 @@ export const updateOrderStatus = async (req, res) => {
     const order = await Order.findByPk(order_id);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ statusCode: 404, data: { message: 'Order not found' } });
     }
 
     order.status = status;
     await order.save();
 
-    return res.status(200).json({ message: 'Order status updated successfully', order });
+    return res.status(200).json({ statusCode: 200, data: { message: 'Order status updated successfully', order } });
   } catch (error) {
     console.error('Error updating order status:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
   }
 };
 
-export default {createOrder, 
-                getUserOrders, 
-                updateOrderStatus
-
-}
+export default {
+  createOrder,
+  getUserOrders,
+  updateOrderStatus
+};

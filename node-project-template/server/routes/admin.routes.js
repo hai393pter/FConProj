@@ -1,18 +1,15 @@
 import express from 'express';
-import adminControllers from '../Controllers/admin.controllers.js'; // Ensure this path is correct
-import checkAuth from '../middlewares/checkAuth.middleware.js'; // If you want to protect some routes
+import checkAuth from '../middlewares/checkAuth.middleware.js';
+import userControllers from '../Controllers/users.controllers.js';
 
-const adminRouter = express.Router();
-
-// Register admin
 /**
  * @openapi
- * /admin/register:
+ * /users/register:
  *   post:
  *     tags:
- *       - Admin
- *     summary: Register Admin
- *     description: Admin registration
+ *       - Register
+ *     summary: Đăng ký
+ *     description: User registration
  *     requestBody:
  *       required: true
  *       content:
@@ -20,32 +17,73 @@ const adminRouter = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               name:
  *                 type: string
- *                 description: The admin's username. *
  *               email:
  *                 type: string
- *                 description: The admin's email. *
  *               password:
  *                 type: string
- *                 description: The admin's password. *
  *     responses:
  *       201:
- *         description: Admin registered successfully
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 201
+ *                 message:
+ *                   type: string
+ *                   example: "User registered successfully"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
  *       400:
  *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: "Bad request"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
  */
-adminRouter.post('/register', adminControllers.registerAdmin);
 
-// Login admin
+const usersRouter = express.Router();
+usersRouter.post('/register', async (req, res) => {
+    try {
+        const result = await userControllers.register(req, res);
+        return res.status(201).json({
+            statusCode: 201,
+            message: "User registered successfully",
+            data: result
+        });
+    } catch (error) {
+        return res.status(400).json({
+            statusCode: 400,
+            message: error.message,
+            data: {}
+        });
+    }
+});
+
+// User Login
 /**
  * @openapi
- * /admin/login:
+ * /users/login:
  *   post:
  *     tags:
- *       - Admin
- *     summary: Login Admin
- *     description: Admin login
+ *       - User
+ *     summary: Đăng nhập
  *     requestBody:
  *       required: true
  *       content:
@@ -57,14 +95,145 @@ adminRouter.post('/register', adminControllers.registerAdmin);
  *                 type: string
  *               password:
  *                 type: string
+ *     security:
+ *       - bearerAuth: [] 
  *     responses:
  *       200:
- *         description: Admin logged in successfully
- *       400:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: "Login successfully"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
+ *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid credentials"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
  */
-adminRouter.post('/login', adminControllers.loginAdmin);
+usersRouter.post('/login', async (req, res) => {
+    try {
+        const result = await userControllers.login(req, res);
+        return res.status(200).json({
+            statusCode: 200,
+            message: "Login successfully",
+            data: result
+        });
+    } catch (error) {
+        return res.status(401).json({
+            statusCode: 401,
+            message: "Invalid credentials",
+            data: {}
+        });
+    }
+});
 
+// Get Current User (authenticated)
+/**
+ * @openapi
+ * /users/me:
+ *   get:
+ *     tags:
+ *       - User
+ *     summary: Lấy thông tin người dùng
+ *     description: Get currently logged-in user information
+ *     security:
+ *       - bearerAuth: [] 
+ *     responses:
+ *       200:
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: "User information retrieved successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: User's ID
+ *                     name:
+ *                       type: string
+ *                       description: User's name
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                       description: User's email address
+ *       401:
+ *         description: Unauthorized, user not logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized, user not logged in"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ *                 data:
+ *                   type: object
+ *                   additionalProperties: {}
+ */
+usersRouter.get('/me', checkAuth, async (req, res) => {
+    try {
+        const user = await userControllers.getMe(req, res);
+        return res.status(200).json({
+            statusCode: 200,
+            message: "User information retrieved successfully",
+            data: user
+        });
+    } catch (error) {
+        return res.status(404).json({
+            statusCode: 404,
+            message: "User not found",
+            data: {}
+        });
+    }
+});
 
-// Export router
-export default adminRouter;
+export default usersRouter;

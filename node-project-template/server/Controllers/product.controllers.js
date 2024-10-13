@@ -1,21 +1,37 @@
 import Product from '../Models/productModel.js'; // Đảm bảo đường dẫn đúng
 import moment from 'moment';
-import  Op  from 'sequelize';
-// Tạo sản phẩm mới
+import { Op } from 'sequelize';
 
+// Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
     console.log(req.body);
-    const { name,  category, price, description, imageUrl} = req.body; // Lấy thông tin sản phẩm từ body
+    const { name, category, price, description, imageUrl } = req.body; // Lấy thông tin sản phẩm từ body
 
     try {
-        const newProduct = await Product.create({ name, category, price, description, imageUrl, timeStamp: moment().tz('Asia/Bangkok').toDate() });
-        return res.status(201).json({ message: "Product created successfully", productId: newProduct.id });
+        const newProduct = await Product.create({ 
+            name, 
+            category, 
+            price, 
+            description, 
+            imageUrl, 
+            timeStamp: moment().tz('Asia/Bangkok').toDate() 
+        });
+        return res.status(201).json({ 
+            statusCode: 201, 
+            message: "Product created successfully", 
+            productId: newProduct.id 
+        });
     } catch (error) {
         console.error("Error creating product:", error);
-        return res.status(500).json({ message: "Error creating product", error: error.message });
+        return res.status(500).json({ 
+            statusCode: 500, 
+            message: "Error creating product", 
+            error: error.message 
+        });
     }
 };
-//Get all products based on category, min(max) price
+
+// Get all products based on category, min(max) price
 export const getAllProducts = async (req, res) => {
     try {
         const { category, min_price, max_price } = req.query;
@@ -36,11 +52,18 @@ export const getAllProducts = async (req, res) => {
         }
 
         // Fetch all products or filtered products from the database
-        const products = await Product.findAll({ where: filter });
-        return res.status(200).json(products);
+        const data = await Product.findAll({ where: filter });
+        return res.status(200).json({ 
+            statusCode: 200, 
+            data 
+        });
     } catch (error) {
         console.error("Error fetching products:", error);
-        return res.status(500).json({ message: "Error fetching products", error: error.message });
+        return res.status(500).json({ 
+            statusCode: 500, 
+            message: "Error fetching products", 
+            error: error.message 
+        });
     }
 };
 
@@ -49,52 +72,71 @@ export const getProduct = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const product = await Product.findByPk(id); // Sử dụng findByPk hoặc phương thức phù hợp với mô hình của bạn
-        console.log(product);
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+        const data = await Product.findByPk(id); // Sử dụng findByPk hoặc phương thức phù hợp với mô hình của bạn
+        console.log(data);
+        if (!data) {
+            return res.status(404).json({ 
+                statusCode: 404, 
+                message: "Product not found" 
+            });
         }
         
-        return res.status(200).json(product);
+        return res.status(200).json({ 
+            statusCode: 200, 
+            data
+        });
     } catch (error) {
         console.error("Error fetching product:", error);
-        return res.status(500).json({ message: "Error fetching product", error: error.message });
+        return res.status(500).json({ 
+            statusCode: 500, 
+            message: "Error fetching product", 
+            error: error.message 
+        });
     }
 };
 
 // Chỉnh sửa thông tin sản phẩm theo ID
 export const updateProduct = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.body; // Thay đổi: Lấy ID từ body
     const { name, category, price, description, imageUrl } = req.body;
 
     try {
-        const product = await Product.findByPk(id);
+        const data = await Product.findByPk(id);
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({ 
+                statusCode: 404, 
+                message: "Product not found" 
+            });
         }
         // Cập nhật thông tin sản phẩm
-        product.name = name || product.name;
-        product.category = category || product.category;
-        product.price = price || product.price;
-        product.description = description || product.description;
-        product.imageUrl = imageUrl || product.imageUrl;
-        product.updatedAt = moment().tz('Asia/Bangkok').toDate(); // Cập nhật thời gian theo giờ Việt Nam
-        product.timeStamp = moment().tz('Asia/Bangkok').toDate();
-        await product.save();
+        data.name = name || data.name;
+        data.category = category || data.category;
+        data.price = price || data.price;
+        data.description = description || data.description;
+        data.imageUrl = imageUrl || data.imageUrl;
+        data.updatedAt = moment().tz('Asia/Bangkok').toDate(); // Cập nhật thời gian theo giờ Việt Nam
+        data.timeStamp = moment().tz('Asia/Bangkok').toDate();
+        await data.save();
 
-        return res.status(200).json({ message: "Product updated successfully", product });
+        return res.status(200).json({ 
+            statusCode: 200, 
+            message: "Product updated successfully", 
+            data
+        });
     } catch (error) {
         console.error("Error updating product:", error);
-        return res.status(500).json({ message: "Error updating product", error: error.message });
+        return res.status(500).json({ 
+            statusCode: 500, 
+            message: "Error updating product", 
+            error: error.message 
+        });
     }
-    
-    
-    
 };
-    // Filter products based on query parameters
+
+// Filter products based on query parameters
 export const filterProducts = async (req, res) => {
     try {
-        const { category, min_price, max_price, page = 1, limit = 10 } = req.query;
+        const { category, min_price, max_price, page = 1, limit = 5 } = req.query;
 
         // Build the filter criteria
         let filter = {};
@@ -115,8 +157,10 @@ export const filterProducts = async (req, res) => {
         // Calculate offset for pagination
         const offset = (page - 1) * limit;
 
+        console.log (filter);
+
         // Fetch filtered products with pagination
-        const products = await Product.findAll({
+        const data = await Product.findAll({
             where: filter,
             limit: parseInt(limit),
             offset: parseInt(offset)
@@ -126,19 +170,21 @@ export const filterProducts = async (req, res) => {
         const totalProducts = await Product.count({ where: filter });
 
         return res.status(200).json({
+            statusCode: 200,
             totalProducts,
             totalPages: Math.ceil(totalProducts / limit),
             currentPage: parseInt(page),
-            products
+            data
         });
     } catch (error) {
         console.error('Error filtering products:', error);
-        return res.status(500).json({ message: 'Server error', error: error.message });
+        return res.status(500).json({ 
+            statusCode: 500, 
+            message: 'Server error', 
+            error: error.message 
+        });
     }
 };
 
 // Tất cả các hàm
 export default { createProduct, getProduct, updateProduct, filterProducts, getAllProducts };
-
-
-

@@ -5,7 +5,7 @@ const router = express.Router();
 
 /**
  * @openapi
- * /payment:
+ * /payments:
  *   post:
  *     summary: Tạo thanh toán mới qua VNPAY.
  *     description: Tạo giao dịch thanh toán cho đơn hàng thông qua cổng thanh toán VNPAY.
@@ -74,7 +74,7 @@ router.post('/', createPayment);
 
 /**
  * @openapi
- * /payment/callback:
+ * /payments/callback:
  *   get:
  *     summary: Callback từ VNPAY sau khi thanh toán hoàn tất.
  *     description: Xử lý phản hồi từ VNPAY và cập nhật trạng thái thanh toán.

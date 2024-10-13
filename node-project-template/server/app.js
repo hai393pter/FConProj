@@ -5,15 +5,9 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from './swagger.js';
 
 // Routes
-import usersRouter from './routes/users.routes.js';
-import adminRouter from './routes/admin.routes.js';
-import productRouter from './routes/products.routes.js';
-import cartRouter from './routes/carts.routes.js';
 import ApplicationConfig from './config/config.js';
-import orderRouter from './routes/order.routes.js';
-import careRouter from './routes/careSchedule.routes.js';
-import paymentsRouter from './routes/payments.routes.js';
 
+import routes from './routes/index.js'
 
 // Express App Setup
 const app = express();
@@ -24,14 +18,9 @@ app.use(cors());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-
-app.use('/users', usersRouter);
-app.use('/admin', adminRouter);
-app.use('/products', productRouter);
-app.use('/cartitems', cartRouter);
-app.use('/orders',orderRouter);
-app.use('/careschedules', careRouter);
-app.use('/payments', paymentsRouter);
+routes.forEach(route => {
+    app.use(route.path, route.router);
+});
 
 
 // Catch 404 and forward to error handler

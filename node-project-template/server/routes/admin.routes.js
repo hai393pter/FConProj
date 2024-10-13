@@ -1,9 +1,9 @@
 import express from 'express';
-import checkAuth from '../middlewares/checkAuth.middleware.js';
 import adminControllers from '../Controllers/admin.controllers.js';
+const usersRouter = express.Router();
 /**
  * @openapi
- * /users/register:
+ * /admins/register:
  *   post:
  *     tags:
  *       - Register
@@ -57,16 +57,16 @@ import adminControllers from '../Controllers/admin.controllers.js';
  *                   additionalProperties: {}
  */
 
-const usersRouter = express.Router();
+
 usersRouter.post('/register', adminControllers.registerAdmin);
 
 // User Login
 /**
  * @openapi
- * /users/login:
+ * /admins/login:
  *   post:
  *     tags:
- *       - User
+ *       - Authentication
  *     summary: Đăng nhập
  *     requestBody:
  *       required: true
@@ -120,10 +120,10 @@ usersRouter.post('/login', adminControllers.loginAdmin);
 // Get Current User (authenticated)
 /**
  * @openapi
- * /users/me:
+ * /admins/me:
  *   get:
  *     tags:
- *       - User
+ *       - Admin
  *     summary: Lấy thông tin người dùng
  *     description: Get currently logged-in user information
  *     security:

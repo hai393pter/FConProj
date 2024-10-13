@@ -1,10 +1,19 @@
-import express from 'express'
-import { MessageResponse } from '../common/reponses.js'
+import adminRoute from './admin.routes.js';
+import careScheduleRoute from './careSchedule.routes.js'
+import usersRoute from './users.routes.js';
+import productRoute from './products.routes.js';
+import cartRoute from './carts.routes.js';
+import orderRoute from './order.routes.js';
+import paymentsRoute from './payments.routes.js';
 
-const router = express.Router()
+const routes = [
+    {path: '/admins', router: adminRoute},
+    {path: '/care-schedules', router: careScheduleRoute},
+    {path: '/users', router: usersRoute},
+    {path: '/products', router: productRoute},
+    {path: '/carts', router: cartRoute},
+    {path: '/orders', router: orderRoute},
+    {path: '/payments', router: paymentsRoute},
+];
 
-router.get('/', (req, res) => {
-    res.json(MessageResponse('Welcome to my server'))
-})
-
-export default router
+export default routes;

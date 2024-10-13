@@ -39,7 +39,7 @@ const careRouter = express.Router();
  *           example: "Use room temperature water"
  * 
  * paths:
- *   /careschedules:
+ *   /care-schedules:
  *     post:
  *       summary: Tạo lịch mới
  *       tags:
@@ -94,7 +94,7 @@ const careRouter = express.Router();
  *         500:
  *           description: Server error
  * 
- *   /careschedules/{id}:
+ *   /care-schedules/{id}:
  *     get:
  *       summary: Xem lịch chăm sóc dựa trên mã lịch
  *       tags:

@@ -7,12 +7,12 @@ import {
   addProductToCart,
 } from '../Controllers/cart.controllers.js'; // Ensure correct path
 
-
+const cartRouter = express.Router();
 
 // Route to create a new cart
 /**
  * @openapi
- * /cartitems:
+ * /carts:
  *   post:
  *     summary: Tạo giỏ hàng mới
  *     tags: [Cart]
@@ -43,13 +43,13 @@ import {
  *       404:
  *         description: Không thể tìm thấy người dùng
  */
-const cartRouter = express.Router();
+
 cartRouter.post('/', createCart);
 
 // Route to get a user's cart by userId
 /**
  * @openapi
- * /cartitems/{user_id}:
+ * /carts/{user_id}:
  *   get:
  *     summary: Lấy giỏ hàng theo mã người dùng
  *     tags: [Cart]
@@ -70,7 +70,7 @@ cartRouter.get('/:user_id', getCart);
 // Add product to cart
 /**
  * @openapi
- * /cartitems/add:
+ * /carts/add:
  *   post:
  *     summary: Thêm sản phẩm vào giỏ hàng.
  *     tags: [Cart]
@@ -102,7 +102,7 @@ cartRouter.post('/add', addProductToCart);
 // Route to update a cart by cartId
 /**
  * @openapi
- * /cartitems/{cartId}:
+ * /carts/{cartId}:
  *   put:
  *     summary: Cập nhật giỏ hàng
  *     tags: [Cart]
@@ -136,7 +136,7 @@ cartRouter.put('/:cartId', updateCart);
 // Route to delete a cart by cartId
 /**
  * @openapi
- * /cartitems/{cartId}:
+ * /carts/{cartId}:
  *   delete:
  *     summary: Xóa giỏ hàng
  *     tags: [Cart]

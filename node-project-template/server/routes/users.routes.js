@@ -41,7 +41,7 @@ usersRouter.post('/register', userControllers.register);
  * /users/login:
  *   post:
  *     tags:
- *       - User
+ *       - Authentication
  *     summary: Đăng nhập
  *     requestBody:
  *       required: true

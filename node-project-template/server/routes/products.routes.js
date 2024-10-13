@@ -51,33 +51,44 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
 /**
  * @openapi
  * /products/filter:
- *   post:
+ *   get:
  *     summary: Tìm sản phẩm bằng filter
  *     tags: [Products]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               category:
- *                 type: string
- *                 description: The category of the products to filter by
- *               min_price:
- *                 type: number
- *                 format: float
- *                 description: Minimum price of the products
- *               max_price:
- *                 type: number
- *                 format: float
- *                 description: Maximum price of the products
- *               page:
- *                 type: integer
- *                 description: The page number for pagination (default is 1)
- *               size:
- *                 type: integer
- *                 description: The number of products per page (default is 5)
+ *     parameters:
+ *       - name: category
+ *         in: query
+ *         required: false
+ *         description: The category of the products to filter by
+ *         schema:
+ *           type: string
+ *       - name: min_price
+ *         in: query
+ *         required: false
+ *         description: Minimum price of the products
+ *         schema:
+ *           type: number
+ *           format: float
+ *       - name: max_price
+ *         in: query
+ *         required: false
+ *         description: Maximum price of the products
+ *         schema:
+ *           type: number
+ *           format: float
+ *       - name: page
+ *         in: query
+ *         required: false
+ *         description: The page number for pagination (default is 1)
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - name: size
+ *         in: query
+ *         required: false
+ *         description: The number of products per page (default is 5)
+ *         schema:
+ *           type: integer
+ *           default: 5
  *     responses:
  *       200:
  *         description: A list of filtered products
@@ -118,7 +129,7 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
  *       500:
  *         description: Có lỗi khi tìm sản phẩm
  */
-productRouter.post('/filter', productsControllers.filterProducts);
+productRouter.get('/filter', productsControllers.filterProducts);
 
 
 // Kiểm tra thông tin sản phẩm theo ID

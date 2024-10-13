@@ -1,7 +1,6 @@
 import express from 'express';
 import checkAuth from '../middlewares/checkAuth.middleware.js';
-import userControllers from '../Controllers/users.controllers.js';
-
+import adminControllers from '../Controllers/admin.controllers.js';
 /**
  * @openapi
  * /users/register:
@@ -59,22 +58,7 @@ import userControllers from '../Controllers/users.controllers.js';
  */
 
 const usersRouter = express.Router();
-usersRouter.post('/register', async (req, res) => {
-    try {
-        const result = await userControllers.register(req, res);
-        return res.status(201).json({
-            statusCode: 201,
-            message: "User registered successfully",
-            data: result
-        });
-    } catch (error) {
-        return res.status(400).json({
-            statusCode: 400,
-            message: error.message,
-            data: {}
-        });
-    }
-});
+usersRouter.post('/register', adminControllers.registerAdmin);
 
 // User Login
 /**
@@ -131,22 +115,7 @@ usersRouter.post('/register', async (req, res) => {
  *                   type: object
  *                   additionalProperties: {}
  */
-usersRouter.post('/login', async (req, res) => {
-    try {
-        const result = await userControllers.login(req, res);
-        return res.status(200).json({
-            statusCode: 200,
-            message: "Login successfully",
-            data: result
-        });
-    } catch (error) {
-        return res.status(401).json({
-            statusCode: 401,
-            message: "Invalid credentials",
-            data: {}
-        });
-    }
-});
+usersRouter.post('/login', adminControllers.loginAdmin);
 
 // Get Current User (authenticated)
 /**
@@ -219,21 +188,6 @@ usersRouter.post('/login', async (req, res) => {
  *                   type: object
  *                   additionalProperties: {}
  */
-usersRouter.get('/me', checkAuth, async (req, res) => {
-    try {
-        const user = await userControllers.getMe(req, res);
-        return res.status(200).json({
-            statusCode: 200,
-            message: "User information retrieved successfully",
-            data: user
-        });
-    } catch (error) {
-        return res.status(404).json({
-            statusCode: 404,
-            message: "User not found",
-            data: {}
-        });
-    }
-});
+usersRouter.get('/me', adminControllers.getMe);
 
 export default usersRouter;

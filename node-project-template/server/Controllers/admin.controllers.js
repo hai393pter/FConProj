@@ -72,7 +72,7 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-/*
+
 // Get current logged-in admin info (getMe)
 export const getMe = async (req, res) => {
   try {
@@ -95,7 +95,6 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
-*/
 
 // Export all controllers
-export default { registerAdmin, loginAdmin /* getMe */ };
+export default { registerAdmin, loginAdmin, getMe };

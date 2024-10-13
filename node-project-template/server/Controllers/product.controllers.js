@@ -138,51 +138,63 @@ export const filterProducts = async (req, res) => {
     try {
         const { category, min_price, max_price, page = 1, limit = 5 } = req.query;
 
-        // Build the filter criteria
+        // Chuyển đổi page và limit sang số nguyên
+        const pageNumber = parseInt(page, 10) || 1;
+        const limitNumber = parseInt(limit, 10) || 5;
+
+        // Tạo filter cho category và price
         let filter = {};
         if (category) {
-            filter.category = category; // Filter by category
+            filter.category = category;
         }
 
         if (min_price || max_price) {
             filter.price = {};
             if (min_price && !isNaN(parseFloat(min_price))) {
-                filter.price[Op.gte] = parseFloat(min_price); // Greater than or equal to min_price
+                filter.price[Op.gte] = parseFloat(min_price); // Lớn hơn hoặc bằng min_price
             }
             if (max_price && !isNaN(parseFloat(max_price))) {
-                filter.price[Op.lte] = parseFloat(max_price); // Less than or equal to max_price
+                filter.price[Op.lte] = parseFloat(max_price); // Nhỏ hơn hoặc bằng max_price
             }
         }
 
-        // Calculate offset for pagination
-        const offset = (page - 1) * limit;
+        // Tính toán offset cho pagination
+        const offset = (pageNumber - 1) * limitNumber;
 
-        // Fetch filtered products with pagination
+        // Lấy danh sách sản phẩm đã filter với phân trang
         const data = await Product.findAll({
             where: filter,
-            limit: parseInt(limit, 10), // Convert limit to integer
-            offset: parseInt(offset, 10)  // Convert offset to integer
+            limit: limitNumber,
+            offset: offset
         });
 
-        // Fetch total count for pagination metadata
-        const totalProducts = await Product.count({ where: filter });
+        // Lấy tổng số lượng sản phẩm đã filter
+        const totalElements = await Product.count({ where: filter });
+
+        // Tính số trang
+        const totalPages = Math.ceil(totalElements / limitNumber);
 
         return res.status(200).json({
             statusCode: 200,
-            totalProducts,
-            totalPages: Math.ceil(totalProducts / limit),
-            currentPage: parseInt(page, 10), // Convert currentPage to integer
-            data,
+            message: "Lọc sản phẩm thành công",
+            data: {
+                totalPages,
+                totalElements,
+                size: limitNumber, // Số lượng sản phẩm trong mỗi trang
+                currentPage: pageNumber,
+                products: data
+            }
         });
     } catch (error) {
         console.error('Error filtering products:', error);
         return res.status(500).json({ 
             statusCode: 500, 
-            message: 'Server error', 
+            message: 'Lỗi server', 
             error: error.message 
         });
     }
 };
+
 
 // Tất cả các hàm
 export default { createProduct, getProduct, updateProduct, filterProducts, getAllProducts };

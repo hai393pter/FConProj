@@ -51,37 +51,33 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
 /**
  * @openapi
  * /products/filter:
- *   get:
+ *   post:
  *     summary: Tìm sản phẩm bằng filter
  *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: The category of the products to filter by
- *       - in: query
- *         name: min_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Minimum price of the products
- *       - in: query
- *         name: max_price
- *         schema:
- *           type: number
- *           format: float
- *         description: Maximum price of the products
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: The page number for pagination (default is 1)
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: The number of products per page (default is 5)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 description: The category of the products to filter by
+ *               min_price:
+ *                 type: number
+ *                 format: float
+ *                 description: Minimum price of the products
+ *               max_price:
+ *                 type: number
+ *                 format: float
+ *                 description: Maximum price of the products
+ *               page:
+ *                 type: integer
+ *                 description: The page number for pagination (default is 1)
+ *               size:
+ *                 type: integer
+ *                 description: The number of products per page (default is 5)
  *     responses:
  *       200:
  *         description: A list of filtered products
@@ -92,32 +88,37 @@ productRouter.post('/', checkAuth, checkImageUrl, productsControllers.createProd
  *               properties:
  *                 statusCode:
  *                   type: integer
- *                 totalProducts:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 currentPage:
- *                   type: integer
+ *                 message:
+ *                   type: string
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       name:
- *                         type: string
- *                       price:
- *                         type: number
- *                         format: float
- *                       description:
- *                         type: string
- *                       imageUrl:
- *                         type: string
+ *                   type: object
+ *                   properties:
+ *                     totalPages:
+ *                       type: integer
+ *                     totalElements:
+ *                       type: integer
+ *                     size:
+ *                       type: integer
+ *                     products:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           name:
+ *                             type: string
+ *                           price:
+ *                             type: number
+ *                             format: float
+ *                           description:
+ *                             type: string
+ *                           imageUrl:
+ *                             type: string
  *       500:
  *         description: Có lỗi khi tìm sản phẩm
  */
-productRouter.get('/filter', productsControllers.filterProducts);
+productRouter.post('/filter', productsControllers.filterProducts);
 
 
 // Kiểm tra thông tin sản phẩm theo ID

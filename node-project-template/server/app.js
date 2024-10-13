@@ -44,9 +44,11 @@ app.use(function(req, res, next) {
 
 // Error handler
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500).json({
-        message: "Error Message"
-    });
+    if (!res.headersSent) {
+        res.status(err.status || 500).json({
+            message: err.message || 'Internal server error',
+        });
+    }
 });
 
 // Start the server

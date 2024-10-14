@@ -23,6 +23,28 @@ const Payment = sequelize.define('Payment', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  transactionId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    onUpdate: DataTypes.NOW,
+  },
+  paymentStatus:{
+    type: DataTypes.STRING,
+    defaultValue: 'pending',
+    allowNull: false,
+  },
+  transactionDate:{
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 });
 
 // Sync model with the database

@@ -46,11 +46,11 @@ export const createPayment = async (req, res) => {
     const paymentUrl = `${vnpUrl}?${queryParams}`;
 
     // Redirect user to VNPAY payment page
-    return res.status(200).json({ data: { statusCode: 200, message: 'Redirect to payment', url: paymentUrl } });
+    return res.status(200).json({ statusCode: 200, data: {  message: 'Redirect to payment', url: paymentUrl } });
 
   } catch (error) {
     console.error('Error creating payment:', error);
-    return res.status(500).json({ data: { statusCode: 500, message: 'Server error', error: error.message } });
+    return res.status(500).json({ statusCode: 500, data: {  message: 'Server error', error: error.message } });
   }
 };
 
@@ -70,7 +70,7 @@ export const paymentCallback = async (req, res) => {
     const checkSignature = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     if (checkSignature !== vnp_SecureHash) {
-      return res.status(400).json({ data: { statusCode: 400, message: 'Invalid signature' } });
+      return res.status(400).json({ statusCode: 400, data: {  message: 'Invalid signature' } });
     }
 
     // Check VNPAY response code
@@ -84,13 +84,13 @@ export const paymentCallback = async (req, res) => {
         { where: { order_id: vnp_TxnRef } }
       );
 
-      return res.status(200).json({ data: { statusCode: 200, message: 'Payment successful', transactionId: vnp_TransactionNo } });
+      return res.status(200).json({ statusCode: 200, data: {  message: 'Payment successful', transactionId: vnp_TransactionNo } });
     } else {
-      return res.status(400).json({ data: { statusCode: 400, message: 'Payment failed', code: vnp_ResponseCode } });
+      return res.status(400).json({ statusCode: 400, data: {  message: 'Payment failed', code: vnp_ResponseCode } });
     }
   } catch (error) {
     console.error('Error in payment callback:', error);
-    return res.status(500).json({ data: { statusCode: 500, message: 'Server error', error: error.message } });
+    return res.status(500).json({ statusCode: 500, data: {  message: 'Server error', error: error.message } });
   }
 };
 

@@ -14,7 +14,7 @@ export const createPayment = async (req, res) => {
   try {
     const order = await Order.findByPk(order_id);
     if (!order) {
-      return res.status(404).json({ data: { statusCode: 404, message: 'Order not found' } });
+      return res.status(404).json({ statusCode: 404, data: {  message: 'Order not found' } });
     }
 
     // Đảm bảo định dạng vnp_CreateDate đúng chuẩn yyyyMMddHHmmss

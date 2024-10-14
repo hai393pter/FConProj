@@ -7,8 +7,8 @@ const router = express.Router();
  * @openapi
  * /payments:
  *   post:
- *     summary: Tạo thanh toán mới qua VNPAY.
- *     description: Tạo giao dịch thanh toán cho đơn hàng thông qua cổng thanh toán VNPAY.
+ *     summary: Create a new payment via VNPAY.
+ *     description: Initiate a payment transaction for an order using VNPAY.
  *     tags:
  *       - Payments
  *     requestBody:
@@ -24,14 +24,14 @@ const router = express.Router();
  *               order_id:
  *                 type: integer
  *                 example: 123
- *                 description: ID của đơn hàng.
+ *                 description: The ID of the order.
  *               amount:
  *                 type: number
  *                 example: 500000
- *                 description: Số tiền cần thanh toán (VND).
+ *                 description: The amount to be paid (in VND).
  *     responses:
  *       200:
- *         description: Trả về URL để chuyển hướng tới VNPAY.
+ *         description: Returns a URL to redirect to VNPAY.
  *         content:
  *           application/json:
  *             schema:
@@ -44,7 +44,7 @@ const router = express.Router();
  *                   type: string
  *                   example: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?params=...
  *       400:
- *         description: Lỗi xử lý thanh toán.
+ *         description: Error processing the payment.
  *         content:
  *           application/json:
  *             schema:
@@ -57,7 +57,7 @@ const router = express.Router();
  *                   type: string
  *                   example: 99
  *       500:
- *         description: Lỗi server.
+ *         description: Server error.
  *         content:
  *           application/json:
  *             schema:
@@ -76,8 +76,8 @@ router.post('/', createPayment);
  * @openapi
  * /payments/callback:
  *   get:
- *     summary: Callback từ VNPAY sau khi thanh toán hoàn tất.
- *     description: Xử lý phản hồi từ VNPAY và cập nhật trạng thái thanh toán.
+ *     summary: VNPAY callback after payment completion.
+ *     description: Handles the VNPAY response and updates the payment status.
  *     tags:
  *       - Payments
  *     parameters:
@@ -87,17 +87,31 @@ router.post('/', createPayment);
  *           type: string
  *           example: 00
  *         required: true
- *         description: Mã phản hồi từ VNPAY.
+ *         description: The response code from VNPAY.
  *       - in: query
  *         name: vnp_TxnRef
  *         schema:
  *           type: string
  *           example: 123
  *         required: true
- *         description: ID giao dịch của đơn hàng.
+ *         description: The transaction reference ID.
+ *       - in: query
+ *         name: vnp_TransactionNo
+ *         schema:
+ *           type: string
+ *           example: 456789
+ *         required: true
+ *         description: The transaction ID from VNPAY.
+ *       - in: query
+ *         name: vnp_SecureHash
+ *         schema:
+ *           type: string
+ *           example: d41d8cd98f00b204e9800998ecf8427e
+ *         required: true
+ *         description: The secure hash to validate the callback data.
  *     responses:
  *       200:
- *         description: Phản hồi callback thành công.
+ *         description: Payment callback successfully processed.
  *         content:
  *           application/json:
  *             schema:
@@ -105,12 +119,25 @@ router.post('/', createPayment);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Payment callback received
- *                 responseCode:
+ *                   example: Payment successful
+ *                 transactionId:
  *                   type: string
- *                   example: 00
+ *                   example: 456789
+ *       400:
+ *         description: Payment failed.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Payment failed
+ *                 code:
+ *                   type: string
+ *                   example: 99
  *       500:
- *         description: Lỗi server.
+ *         description: Server error.
  *         content:
  *           application/json:
  *             schema:

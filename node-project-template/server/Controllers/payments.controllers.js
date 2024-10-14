@@ -23,14 +23,14 @@ export const createPayment = async (req, res) => {
     const data = {
       vnp_Version: '2.1.0',
       vnp_TmnCode: tmnCode,
-      vnp_Amount: amount * 100, // Nhân với 100 để chuyển thành đơn vị nhỏ nhất của VND
+      vnp_Amount: Math.round(amount * 100), // Nhân với 100 để chuyển thành đơn vị nhỏ nhất của VND
       vnp_Command: 'pay',
       vnp_CreateDate: createDate,
       vnp_CurrCode: 'VND',
       vnp_IpAddr: req.ip,
       vnp_Locale: 'vn',
       vnp_OrderInfo: `Thanh toán cho đơn hàng ${order_id}`,
-      vnp_ReturnUrl: `${req.protocol}://${req.get('host')}/payments/callback`, // Đảm bảo URL callback chính xác
+      vnp_ReturnUrl: encodeURIComponent(`${req.protocol}://${req.get('host')}/payments/callback`), // Đảm bảo URL callback chính xác
       vnp_TxnRef: order_id.toString(),
     };
 

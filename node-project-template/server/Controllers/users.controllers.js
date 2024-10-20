@@ -38,12 +38,11 @@ const register = async (req, res) => {
     }
 };
 
-// Login user
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        console.log('Login request received'); 
+        console.log('Login request received');
         const user = await User.findOne({ where: { email } });
 
         if (!user) {
@@ -79,10 +78,17 @@ export const login = async (req, res) => {
 
         // Optionally, generate a token
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Return response with id, username, and email
         return res.status(200).json({
             statusCode: 200,
             message: "Login successful",
-            data: { token }
+            data: {
+                token,
+                id: user.id,
+                username: user.name, 
+                email: user.email
+            }
         });
     } catch (error) {
         console.error("Error logging in:", error);
@@ -93,6 +99,7 @@ export const login = async (req, res) => {
         });
     }
 };
+
 
 // Get the currently logged-in user
 const getMe = async (req, res) => {

@@ -13,7 +13,7 @@ export const createCart = async (req, res) => {
     // Validate user existence
     const user = await User.findByPk(user_id);
     if (!user) {
-      return res.status(404).json({ statusCode: 404, message: 'Không tìm thấy người dùng' });
+      return res.status(200).json({ statusCode: 200, message: 'Không tìm thấy người dùng' });
     }
 
     if (!product_id) {
@@ -48,7 +48,7 @@ export const getCart = async (req, res) => {
     });
 
     if (!cart || cart.length === 0) {
-      return res.status(404).json({ statusCode: 200, message: 'Không thể tìm thấy giỏ hàng' });
+      return res.status(200).json({ statusCode: 200, message: 'Không thể tìm thấy giỏ hàng' });
     }
 
     return res.status(200).json({
@@ -71,7 +71,7 @@ export const addProductToCart = async (req, res) => {
     // Validate product existence
     const product = await Product.findByPk(product_id);
     if (!product) {
-      return res.status(404).json({ statusCode: 404, message: 'Không tìm thấy sản phẩm' });
+      return res.status(200).json({ statusCode: 200, message: 'Không tìm thấy sản phẩm' });
     }
 
     // Check if the cart item already exists
@@ -135,7 +135,7 @@ export const updateCart = async (req, res) => {
     // Find the cart by cartId
     const cartItem = await Cart.findByPk(cartId);
     if (!cartItem) {
-      return res.status(404).json({ statusCode: 200, message: 'Không tìm thấy giỏ hàng' });
+      return res.status(200).json({ statusCode: 200, message: 'Không tìm thấy giỏ hàng' });
     }
 
     // Update cart item
@@ -174,7 +174,7 @@ export const deleteCart = async (req, res) => {
   try {
     const cart = await Cart.findByPk(cartId);
     if (!cart) {
-      return res.status(404).json({ statusCode: 404, message: 'Không tìm thấy giỏ hàng' });
+      return res.status(200).json({ statusCode: 200, message: 'Không tìm thấy giỏ hàng' });
     }
 
     await cart.destroy(); // Deletes the cart

@@ -107,7 +107,7 @@ usersRouter.get('/me', checkAuth, userControllers.getMe);
  * /users/change-password:
  *   post:
  *     tags:
- *       - Users
+ *       - User
  *     summary: Change password for the logged-in user
  *     security:
  *       - bearerAuth: []
@@ -140,7 +140,7 @@ usersRouter.post('/change-password',checkAuth, userControllers.changePassword);
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Users
+ *       - User
  *     requestBody:
  *       required: true
  *       content:
@@ -177,7 +177,7 @@ usersRouter.post('/forgot-password', userControllers.forgotPassword);
  *   post:
  *     summary: Đặt lại mật khẩu
  *     tags:
- *       - Users
+ *       - User
  *     requestBody:
  *       required: true
  *       content:
@@ -217,7 +217,7 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *   put:
  *     summary: Cập nhật thông tin người dùng
  *     tags:
- *       - Users
+ *       - User
  *     requestBody:
  *       required: true
  *       content:

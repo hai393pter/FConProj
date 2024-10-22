@@ -31,24 +31,37 @@ export const createCart = async (req, res) => {
   }
 };
 
-// Get a user's cart
+// Get a user's cart with product details
 export const getCart = async (req, res) => {
   const { user_id } = req.params; // Expect userId as a route parameter
 
   try {
-    // Find the user's cart
-    const cart = await Cart.findAll({ where: { user_id } });
+    // Find the user's cart and include product details
+    const cart = await Cart.findAll({
+      where: { user_id },
+      include: [
+        {
+          model: Product, // Assuming you have a Product model
+          attributes: ['id', 'name', 'price', 'description'], // Specify the fields you want from the Product model
+        },
+      ],
+    });
 
     if (!cart || cart.length === 0) {
-      return res.status(404).json({ statusCode: 404, message: 'Không thể tìm thấy giỏ hàng' });
+      return res.status(404).json({ statusCode: 200, message: 'Không thể tìm thấy giỏ hàng' });
     }
 
-    return res.status(200).json({ statusCode: 200, message: 'Giỏ hàng đã được lấy thành công', data: cart });
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Giỏ hàng đã được lấy thành công',
+      data: cart, // This will now include product information for each cart item
+    });
   } catch (error) {
     console.error('Có lỗi khi lấy giỏ hàng:', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 // Add product to cart
 export const addProductToCart = async (req, res) => {
@@ -68,11 +81,43 @@ export const addProductToCart = async (req, res) => {
       // Update quantity if the product is already in the cart
       existingCartItem.quantity += quantity;
       await existingCartItem.save();
-      return res.status(200).json({ statusCode: 200, message: 'Sản phẩm đã được cập nhật trong giỏ hàng', data: existingCartItem });
+
+      // Retrieve the cart item with product details after update
+      const updatedCartItem = await Cart.findOne({
+        where: { id: existingCartItem.id },
+        include: [
+          {
+            model: Product,
+            attributes: ['id', 'name', 'price', 'description', 'image_url'], // Specify product fields to include
+          },
+        ],
+      });
+
+      return res.status(200).json({ 
+        statusCode: 200, 
+        message: 'Sản phẩm đã được cập nhật trong giỏ hàng', 
+        data: updatedCartItem 
+      });
     } else {
       // Create a new cart item if it doesn't exist
       const newCartItem = await Cart.create({ user_id, product_id, quantity });
-      return res.status(200).json({ statusCode: 200, message: 'Sản phẩm đã được thêm vào giỏ hàng', data: newCartItem });
+
+      // Retrieve the cart item with product details after creation
+      const createdCartItem = await Cart.findOne({
+        where: { id: newCartItem.id },
+        include: [
+          {
+            model: Product,
+            attributes: ['id', 'name', 'price', 'description'], // Specify product fields to include
+          },
+        ],
+      });
+
+      return res.status(200).json({ 
+        statusCode: 200, 
+        message: 'Sản phẩm đã được thêm vào giỏ hàng', 
+        data: createdCartItem 
+      });
     }
   } catch (error) {
     console.error('Có lỗi khi thêm sản phẩm vào giỏ hàng', error);
@@ -80,16 +125,17 @@ export const addProductToCart = async (req, res) => {
   }
 };
 
+
 // Update a cart (add items, etc.)
 export const updateCart = async (req, res) => {
   const { cartId } = req.params; // Expect cartId as a route parameter
   const { product_id, quantity } = req.body; // Expect product_id and quantity to update the cart
 
   try {
-    // Find the cart by id
+    // Find the cart by cartId
     const cartItem = await Cart.findByPk(cartId);
     if (!cartItem) {
-      return res.status(404).json({ statusCode: 404, message: 'Không tìm thấy giỏ hàng' });
+      return res.status(404).json({ statusCode: 200, message: 'Không tìm thấy giỏ hàng' });
     }
 
     // Update cart item
@@ -98,12 +144,28 @@ export const updateCart = async (req, res) => {
     
     await cartItem.save();
 
-    return res.status(200).json({ statusCode: 200, message: 'Giỏ hàng đã được cập nhật', data: cartItem });
+    // After updating, include product information
+    const updatedCartItem = await Cart.findOne({
+      where: { id: cartId },
+      include: [
+        {
+          model: Product, // Assuming you have a Product model associated with Cart
+          attributes: ['id', 'name', 'price', 'description'], // Specify the fields you want to include from Product
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Giỏ hàng đã được cập nhật',
+      data: updatedCartItem, // This will include the updated cart item and its product details
+    });
   } catch (error) {
     console.error('Có lỗi khi cập nhật giỏ hàng', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 // Delete a cart
 export const deleteCart = async (req, res) => {

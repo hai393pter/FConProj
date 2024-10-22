@@ -42,7 +42,7 @@ export const getCart = async (req, res) => {
       include: [
         {
           model: Product, // Assuming you have a Product model
-          attributes: ['id', 'name', 'price', 'description'], // Specify the fields you want from the Product model
+          attributes: ['id', 'name', 'price', 'description','imageUrl'], // Specify the fields you want from the Product model
         },
       ],
     });
@@ -88,7 +88,7 @@ export const addProductToCart = async (req, res) => {
         include: [
           {
             model: Product,
-            attributes: ['id', 'name', 'price', 'description', 'image_url'], // Specify product fields to include
+            attributes: ['id', 'name', 'price', 'description', 'imageUrl'], // Specify product fields to include
           },
         ],
       });
@@ -108,7 +108,7 @@ export const addProductToCart = async (req, res) => {
         include: [
           {
             model: Product,
-            attributes: ['id', 'name', 'price', 'description'], // Specify product fields to include
+            attributes: ['id', 'name', 'price', 'description','imageUrl'], // Specify product fields to include
           },
         ],
       });
@@ -150,7 +150,7 @@ export const updateCart = async (req, res) => {
       include: [
         {
           model: Product, // Assuming you have a Product model associated with Cart
-          attributes: ['id', 'name', 'price', 'description'], // Specify the fields you want to include from Product
+          attributes: ['id', 'name', 'price', 'description', 'imageUrl'], // Specify the fields you want to include from Product
         },
       ],
     });
@@ -179,12 +179,19 @@ export const deleteCart = async (req, res) => {
 
     await cart.destroy(); // Deletes the cart
 
-    return res.status(204).json(); // No content to return after deletion
+    // Return success message after deletion
+    return res.status(200).json({
+      statusCode: 200,
+      data: {
+        message: 'Giỏ hàng đã được xóa thành công'
+      }
+    });
   } catch (error) {
     console.error('Có lỗi khi xóa giỏ hàng', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 // Export all controllers
 export default {

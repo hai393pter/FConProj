@@ -231,7 +231,7 @@ export const forgotPassword = async (req, res) => {
             console.log('Email sent:', info.response); // Ghi log phản hồi từ Gmail
             return res.status(200).json({
                 statusCode: 200,
-                message: 'Password reset email sent'
+                message: 'Liên kết đặt lại mật khẩu đã được gửi đến hòm thư của bạn'
             });
         });
     } catch (error) {

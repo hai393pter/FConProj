@@ -18,18 +18,29 @@ User.init(
             type: DataTypes.STRING,
             unique: true,
             allowNull: false,
+            validate: {
+                isEmail: true, // Ensures that the value is a valid email format
+            },
         },
         password_hash: {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        reset_password_token: {
+            type: DataTypes.STRING,
+            allowNull: true, // This field is nullable, only populated when resetting password
+        },
+        reset_password_expires: {
+            type: DataTypes.DATE,
+            allowNull: true, // Expiration date for the reset token
+        },
     },
     {
         modelName: 'User',
         tableName: 'users',
-        timestamps: true,
+        timestamps: true, // Enables createdAt and updatedAt fields
         sequelize
     }
-)
+);
 
 export default User;

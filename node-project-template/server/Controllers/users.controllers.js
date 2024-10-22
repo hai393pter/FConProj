@@ -134,6 +134,7 @@ const getMe = async (req, res) => {
     }
 };
 
+//Change password
 export const changePassword = async (req, res) => {
     const { id } = req.user; // Use req.user.id instead of user_id
     const { oldPassword, newPassword } = req.body;

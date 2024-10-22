@@ -3,7 +3,7 @@ import express from 'express';
 import checkAuth from '../middlewares/checkAuth.middleware.js';
 import userControllers from '../Controllers/users.controllers.js';
 //import routers from './users.routes.js';
-
+const usersRouter = express.Router();
 /**
  * @openapi
  * /users/register:
@@ -32,7 +32,7 @@ import userControllers from '../Controllers/users.controllers.js';
  *         description: Bad request
  */
 
-const usersRouter = express.Router();
+
 usersRouter.post('/register', userControllers.register);
 
 // User Login
@@ -129,8 +129,7 @@ usersRouter.get('/me', checkAuth, userControllers.getMe);
  *       401:
  *         description: Unauthorized, token missing
  */
-
-usersRouter.post('/change-password',checkAuth, userControllers.changePassword);
+usersRouter.post('/change-password', checkAuth, userControllers.changePassword);
 
 /**
  * @openapi
@@ -269,5 +268,6 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *         description: Server error
  */
 usersRouter.put('/me', checkAuth, userControllers.updateUserInfo);
+
 
 export default usersRouter;

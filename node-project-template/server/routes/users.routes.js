@@ -236,7 +236,7 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *                 type: string
  *                 example: 92/1C Cong Hoa, Go Vap
  *               phone:
- *                 type: integer
+ *                 type: string
  *                 example: 0982173134
  *     responses:
  *       200:

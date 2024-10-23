@@ -19,7 +19,21 @@ User.init(
             unique: true,
             allowNull: false,
             validate: {
-                isEmail: true, // Ensures that the value is a valid email format
+                isEmail: true,
+            },
+        },
+        phone: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                isPhone: true,
+            },
+        },
+        address: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                isAddress: true, 
             },
         },
         password_hash: {

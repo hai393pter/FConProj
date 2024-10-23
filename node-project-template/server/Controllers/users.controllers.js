@@ -309,6 +309,8 @@ export const resetPassword = async (req, res) => {
       // Update fields
       user.name = name || user.name;
       user.email = email || user.email;
+      user.phone = phone || user.phone;
+      user.address = address || user.address;;
   
       await user.save();
   

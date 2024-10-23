@@ -217,8 +217,11 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *     summary: Cập nhật thông tin người dùng
  *     tags:
  *       - User
+<<<<<<< HEAD
  *     security:
  *       - bearerAuth: []
+=======
+>>>>>>> 9e42228d47e153521c8878916af46464233d6c77
  *     requestBody:
  *       required: true
  *       content:

@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@firebase/storage": "^0.13.2",
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
+    "@payos/node": "^1.0.10",
     "argon2": "^0.41.1",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",

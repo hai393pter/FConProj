@@ -1,11 +1,18 @@
 import Payment from '../Models/paymentsModel.js';
 import Order from '../Models/orderModel.js';
-import axios from 'axios';
 import crypto from 'crypto';
+import PayOS from '@payos/node';
 
 const vnpUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const tmnCode = '0ZD5DIPY';
 const hashSecret = 'VEKBXCS2Z96K8AC1810AZCMBLICFPPFD';
+
+const payOS = new PayOS(
+  process.env.PAYOS_CLIENT_ID,
+  process.env.PAYOS_API_KEY,
+  process.env.PAYOS_CHECKSUM_KEY
+);
+
 
 // Create a payment
 export const createPayment = async (req, res) => {
@@ -14,7 +21,7 @@ export const createPayment = async (req, res) => {
   try {
     const order = await Order.findByPk(order_id);
     if (!order) {
-      return res.status(404).json({ statusCode: 404, data: {  message: 'Order not found' } });
+      return res.status(404).json({ statusCode: 404, data: { message: 'Order not found' } });
     }
 
     // Đảm bảo định dạng vnp_CreateDate đúng chuẩn yyyyMMddHHmmss
@@ -30,7 +37,7 @@ export const createPayment = async (req, res) => {
       vnp_IpAddr: req.ip,
       vnp_Locale: 'vn',
       vnp_OrderInfo: `Thanh toán cho đơn hàng ${order_id}`,
-      vnp_ReturnUrl: encodeURIComponent(`${req.protocol}://${req.get('host')}/payments/callback`), // Đảm bảo URL callback chính xác
+      vnp_ReturnUrl: encodeURIComponent(`${req.protocol}://${req.get('host')}/payments/callback`),
       vnp_TxnRef: order_id.toString(),
     };
 
@@ -46,11 +53,11 @@ export const createPayment = async (req, res) => {
     const paymentUrl = `${vnpUrl}?${queryParams}`;
 
     // Redirect user to VNPAY payment page
-    return res.status(200).json({ statusCode: 200, data: {  message: 'Redirect to payment', url: paymentUrl } });
+    return res.status(200).json({ statusCode: 200, data: { message: 'Redirect to payment', url: paymentUrl } });
 
   } catch (error) {
     console.error('Error creating payment:', error);
-    return res.status(500).json({ statusCode: 500, data: {  message: 'Server error', error: error.message } });
+    return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
   }
 };
 
@@ -70,12 +77,10 @@ export const paymentCallback = async (req, res) => {
     const checkSignature = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     if (checkSignature !== vnp_SecureHash) {
-      return res.status(400).json({ statusCode: 400, data: {  message: 'Invalid signature' } });
+      return res.status(400).json({ statusCode: 400, data: { message: 'Invalid signature' } });
     }
 
-    // Check VNPAY response code
     if (vnp_ResponseCode === '00') {
-      // Update payment status in the database
       await Payment.update(
         {
           paymentStatus: 'COMPLETED',
@@ -84,17 +89,71 @@ export const paymentCallback = async (req, res) => {
         { where: { order_id: vnp_TxnRef } }
       );
 
-      return res.status(200).json({ statusCode: 200, data: {  message: 'Payment successful', transactionId: vnp_TransactionNo } });
+      return res.status(200).json({ statusCode: 200, data: { message: 'Payment successful', transactionId: vnp_TransactionNo } });
     } else {
-      return res.status(400).json({ statusCode: 400, data: {  message: 'Payment failed', code: vnp_ResponseCode } });
+      return res.status(400).json({ statusCode: 400, data: { message: 'Payment failed', code: vnp_ResponseCode } });
     }
   } catch (error) {
     console.error('Error in payment callback:', error);
-    return res.status(500).json({ statusCode: 500, data: {  message: 'Server error', error: error.message } });
+    return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
   }
 };
+
+export const createPayOSPaymentLink = async (req, res) => {
+  const { order_id, callbackUrl } = req.body;
+  try {
+    const order = await Order.findByPk(order_id);
+    if (!order) {
+      return res.status(404).json({ statusCode: 404, data: { message: 'Order not found' } });
+    }
+    const body = {
+      orderCode: order_id,
+      amount: amount,
+      description: "Thanh toan don hang",
+      cancelUrl: `${req.protocol}://${req.get('host')}/payments/payOs/failed`,
+      returnUrl: `${req.protocol}://${req.get('host')}/payments/payOs/success`
+    };
+    
+    const paymentLinkRes = await payOS.createPaymentLink(body);
+    await order.update({
+      callback: callbackUrl
+    })
+    return res.status(200).json({ statusCode: 200, data: { message: 'Redirect to payment', url: paymentLinkRes.checkoutUrl } });
+  } catch (err) {
+    return res.status(500).json({ statusCode: 500, data: { message: 'Order Match On PayOs System' } });
+  }
+}
+
+export const payOsPaymentCallbackSuccess = async (req, res) => {
+  const {orderCode} = req.body.data;
+  try {
+    payOS.verifyPaymentWebhookData(req.body);
+    const order = await Order.findByPk({order_id: orderCode});
+    if (order) {
+      await order.update(
+        {
+          status: 'shipped'
+        }
+      );
+      const callback = `${order.callback}/payments/success/${orderCode}`
+      return res.redirect({url: callback, status: 301});
+    }else {
+      const callback = `${order.callback}/payments/failed/${orderCode}`
+      return res.redirect({url: callback, status: 301});
+    }
+  } catch (err) {
+      return res.status(500);
+  }
+}
+
+export const payOsPaymentCallbackFailed = async (req, res) => {
+  console.log(req);
+  return res.status(200);
+}
 
 export default {
   createPayment,
   paymentCallback,
+  createPayOSPaymentLink,
+  payOsPaymentCallbackSuccess
 };

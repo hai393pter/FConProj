@@ -28,6 +28,11 @@ Order.init(
       defaultValue: DataTypes.NOW,
       allowNull: false,
     },
+    callback: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: ''
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -45,5 +50,4 @@ Order.init(
     tableName: 'orders',
   }
 );
-
 export default Order;

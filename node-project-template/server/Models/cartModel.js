@@ -31,6 +31,10 @@ Cart.init({
     allowNull: false,
     defaultValue: 1,
   },
+  status: {
+    type: DataTypes.ENUM('paid', 'not_paid'),
+    defaultValue: 'not_paid',
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

@@ -8,7 +8,7 @@ export const createOrder = async (req, res) => {
 
   try {
     // Find the cart for the user
-    const cartItems = await Cart.findAll({ where: { user_id }, include: [Product] });
+    const cartItems = await Cart.findAll({ where: { user_id, status: 'not_paid' }, include: [Product] });
 
     if (!cartItems.length) {
       return res.status(400).json({ statusCode: 400, data: { message: 'Cart is empty' } });
@@ -21,11 +21,12 @@ export const createOrder = async (req, res) => {
     const order = await Order.create({
       user_id,
       total_price: totalPrice,
-      status: 'pending', // default status
-      order_date: new Date(), // order date
+      status: 'pending',
+      callback: '',
+      order_date: new Date(),
     });
 
-    return res.status(200).json({ statusCode: 200, data: { message: 'Order created successfully', order } });
+    return res.status(200).json({ statusCode: 200, data: { message: 'Order created successfully, Please Redirect To Payment', order } });
   } catch (error) {
     console.error('Error creating order:', error);
     return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });

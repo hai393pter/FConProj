@@ -108,27 +108,27 @@ export const createPayOSPaymentLink = async (req, res) => {
     }
     const body = {
       orderCode: order_id,
-      amount: amount,
+      amount: Number(order.total_price),
       description: "Thanh toan don hang",
       cancelUrl: `${req.protocol}://${req.get('host')}/payments/payOs/failed`,
       returnUrl: `${req.protocol}://${req.get('host')}/payments/payOs/success`
     };
-    
+    console.log(body);
     const paymentLinkRes = await payOS.createPaymentLink(body);
     await order.update({
       callback: callbackUrl
     })
     return res.status(200).json({ statusCode: 200, data: { message: 'Redirect to payment', url: paymentLinkRes.checkoutUrl } });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ statusCode: 500, data: { message: 'Order Match On PayOs System' } });
   }
 }
 
 export const payOsPaymentCallbackSuccess = async (req, res) => {
-  const {orderCode} = req.body.data;
+  const { orderCode } = req.query;
   try {
-    payOS.verifyPaymentWebhookData(req.body);
-    const order = await Order.findByPk({order_id: orderCode});
+    const order = await Order.findByPk({ order_id: orderCode });
     if (order) {
       await order.update(
         {
@@ -136,21 +136,34 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
         }
       );
       const callback = `${order.callback}/payments/success/${orderCode}`
-      return res.redirect({url: callback, status: 301});
-    }else {
+      return res.redirect({ url: callback, status: 301 });
+    } else {
       const callback = `${order.callback}/payments/failed/${orderCode}`
-      return res.redirect({url: callback, status: 301});
+      return res.redirect({ url: callback, status: 301 });
     }
   } catch (err) {
-      return res.status(500);
+    return res.status(500);
   }
 }
 
 export const payOsPaymentCallbackFailed = async (req, res) => {
-  console.log(req);
-  return res.status(200);
-}
+  const { orderCode } = req.query;
+  try {
+    const order = await Order.findByPk({ order_id: orderCode });
+    if (order) {
+      await order.update(
+        {
+          status: 'cancelled'
+        }
+      );
 
+    }
+    const callback = `${order.callback}/payments/failed/${orderCode}`
+    return res.redirect({ url: callback, status: 301 });
+  } catch (err) {
+    return res.status(500);
+  }
+}
 export default {
   createPayment,
   paymentCallback,

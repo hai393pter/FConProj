@@ -25,16 +25,10 @@ User.init(
         phone: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {
-                isPhone: true,
-            },
         },
         address: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {
-                isAddress: true, 
-            },
         },
         password_hash: {
             type: DataTypes.STRING,

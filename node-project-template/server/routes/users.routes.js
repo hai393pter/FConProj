@@ -237,7 +237,7 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *                 example: 92/1C Cong Hoa, Go Vap
  *               phone:
  *                 type: string
- *                 example: 0982173134
+ *                 example: "0982173134"
  *     responses:
  *       200:
  *         description: Thông tin người dùng đã được cập nhật thành công
@@ -263,7 +263,7 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *                     address:
  *                       type: string
  *                     phone:
- *                       type: integer
+ *                       type: string
  *       404:
  *         description: Không tìm thấy người dùng
  *       500:

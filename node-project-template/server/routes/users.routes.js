@@ -107,7 +107,7 @@ usersRouter.get('/me', checkAuth, userControllers.getMe);
  * /users/change-password:
  *   post:
  *     tags:
- *       - Authentication
+ *       - User
  *     summary: Change password for the logged-in user
  *     security:
  *       - bearerAuth: []
@@ -139,7 +139,7 @@ usersRouter.post('/change-password', checkAuth, userControllers.changePassword);
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Authentication
+ *       - User
  *     requestBody:
  *       required: true
  *       content:
@@ -176,7 +176,7 @@ usersRouter.post('/forgot-password', userControllers.forgotPassword);
  *   post:
  *     summary: Đặt lại mật khẩu
  *     tags:
- *       - Authentication
+ *       - User
  *     requestBody:
  *       required: true
  *       content:
@@ -216,7 +216,9 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *   put:
  *     summary: Cập nhật thông tin người dùng
  *     tags:
- *       - Authentication
+ *       - User
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -267,7 +269,8 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *       500:
  *         description: Server error
  */
-usersRouter.put('/me', checkAuth, userControllers.updateUserInfo);
+usersRouter.put('/update-info', checkAuth, userControllers.updateUserInfo);
+
 
 
 export default usersRouter;

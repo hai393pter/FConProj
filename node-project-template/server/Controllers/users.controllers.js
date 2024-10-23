@@ -293,11 +293,11 @@ export const resetPassword = async (req, res) => {
 
 //Update information
   export const updateUserInfo = async (req, res) => {
-    const { user_id } = req.user; // Assuming userId is stored in JWT
+    const { id } = req.user; // Assuming userId is stored in JWT
     const { name, email } = req.body; // Example fields to update
   
     try {
-      const user = await User.findByPk(user_id);
+      const user = await User.findByPk(id);
   
       if (!user) {
         return res.status(404).json({

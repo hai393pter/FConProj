@@ -177,6 +177,8 @@ usersRouter.post('/forgot-password', userControllers.forgotPassword);
  *     summary: Đặt lại mật khẩu
  *     tags:
  *       - User
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -214,11 +216,9 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  * @openapi
  * /users/update-info:
  *   put:
- *     summary: Cập nhật thông tin người dùng
+ *     summary: Cập nhật thông tin người dùng    
  *     tags:
  *       - User
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -238,6 +238,8 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  *               phone:
  *                 type: string
  *                 example: "0982173134"
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Thông tin người dùng đã được cập nhật thành công

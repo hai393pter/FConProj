@@ -127,43 +127,55 @@ export const createPayOSPaymentLink = async (req, res) => {
 
 export const payOsPaymentCallbackSuccess = async (req, res) => {
   const { orderCode } = req.query;
+
   try {
+    if (!orderCode) {
+      console.error('No orderCode provided in the request.');
+      return res.status(400).send('Bad Request: orderCode is required');
+    }
     const order = await Order.findByPk(orderCode);
+
     if (order) {
-      await order.update(
-        {
-          status: 'shipped'
-        }
-      );
-      const callback = `${order.callback}/payments/success/${orderCode}`
+      console.log(`Current status of order ${order.id}: ${order.status}`);
+      const result = await order.update({ status: 'delivered' });
+      console.log(`Order ${order.id} updated to status: ${result.status}`);
+
+      const callback = `${order.callback}/payments/success/${orderCode}`;
       return res.redirect(callback);
     } else {
-      const callback = `${order.callback}/payments/failed/${orderCode}`
+      console.warn(`Order not found for orderCode: ${orderCode}`);
+      const callback = `${order.callback}/payments/failed/${orderCode}`;
       return res.redirect(callback);
     }
   } catch (err) {
-    return res.status(500);
+    console.error('Error processing payment callback:', err);
+    return res.status(500).send('Internal Server Error');
   }
 }
 
 export const payOsPaymentCallbackFailed = async (req, res) => {
   const { orderCode } = req.query;
+  if (!orderCode) {
+    console.error('No orderCode provided in the request.');
+    return res.status(400).send('Bad Request: orderCode is required');
+  }
   try {
-    const order = await Order.findByPk({ order_id: orderCode });
+    const order = await Order.findByPk(orderCode);
     if (order) {
-      await order.update(
-        {
-          status: 'cancelled'
-        }
-      );
-
+      console.log(`Updating order ${order.id} to status: cancelled`);
+      await order.update({ status: 'cancelled' });
+      console.log(`Order ${order.id} updated successfully.`);
+    } else {
+      console.warn(`Order not found for orderCode: ${orderCode}`);
     }
-    const callback = `${order.callback}/payments/failed/${orderCode}`
+    const callback = `${order?.callback}/payments/failed/${orderCode}`;
     return res.redirect(callback);
   } catch (err) {
-    return res.status(500);
+    console.error('Error processing payment callback:', err);
+    return res.status(500).send('Internal Server Error');
   }
-}
+};
+
 export default {
   createPayment,
   paymentCallback,

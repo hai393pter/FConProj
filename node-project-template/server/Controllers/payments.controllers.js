@@ -128,7 +128,7 @@ export const createPayOSPaymentLink = async (req, res) => {
 export const payOsPaymentCallbackSuccess = async (req, res) => {
   const { orderCode } = req.query;
   try {
-    const order = await Order.findByPk({ order_id: orderCode });
+    const order = await Order.findByPk(orderCode);
     if (order) {
       await order.update(
         {
@@ -136,10 +136,10 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
         }
       );
       const callback = `${order.callback}/payments/success/${orderCode}`
-      return res.redirect({ url: callback, status: 301 });
+      return res.redirect(callback);
     } else {
       const callback = `${order.callback}/payments/failed/${orderCode}`
-      return res.redirect({ url: callback, status: 301 });
+      return res.redirect(callback);
     }
   } catch (err) {
     return res.status(500);
@@ -159,7 +159,7 @@ export const payOsPaymentCallbackFailed = async (req, res) => {
 
     }
     const callback = `${order.callback}/payments/failed/${orderCode}`
-    return res.redirect({ url: callback, status: 301 });
+    return res.redirect(callback);
   } catch (err) {
     return res.status(500);
   }

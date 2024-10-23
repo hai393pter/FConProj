@@ -24,11 +24,11 @@ User.init(
         },
         phone: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         address: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         password_hash: {
             type: DataTypes.STRING,

@@ -17,6 +17,13 @@ export const createOrder = async (req, res) => {
     // Calculate total price
     const totalPrice = cartItems.reduce((acc, item) => acc + item.quantity * item.Product.price, 0);
 
+    const orderProducts = cartItems.map(item => ({
+      name: item.Product.name,
+      imageUrl: item.Product.imageUrl,
+      quantity: item.quantity,
+      price: item.Product.price,
+    }));
+
     // Create an order
     const order = await Order.create({
       user_id,
@@ -26,7 +33,7 @@ export const createOrder = async (req, res) => {
       order_date: new Date(),
     });
 
-    return res.status(200).json({ statusCode: 200, data: { message: 'Order created successfully, Please Redirect To Payment', order } });
+    return res.status(200).json({ statusCode: 200, data: { message: 'Order created successfully, Please Redirect To Payment', order, products: orderProducts } });
   } catch (error) {
     console.error('Error creating order:', error);
     return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });
@@ -36,13 +43,29 @@ export const createOrder = async (req, res) => {
 // Get all orders for a user
 export const getUserOrders = async (req, res) => {
   const { user_id } = req.params;
-
+  const orders = await Order.findAll({ where: { user_id } });
   try {
-    const orders = await Order.findAll({ where: { user_id } });
+    // Find the cart for the user
+    const cartItems = await Cart.findAll({ where: { user_id, status: 'not_paid' }, include: [Product] });
+
+    if (!cartItems.length) {
+      return res.status(400).json({ statusCode: 400, data: { message: 'Cart is empty' } });
+    }
+
+    // Calculate total price
+    const totalPrice = cartItems.reduce((acc, item) => acc + item.quantity * item.Product.price, 0);
+
+    const orderProducts = cartItems.map(item => ({
+      name: item.Product.name,
+      imageUrl: item.Product.imageUrl,
+      quantity: item.quantity,
+      price: item.Product.price,
+    }));
+    
     if (!orders.length) {
       return res.status(404).json({ statusCode: 404, data: { message: 'No orders found for the user' } });
     }
-    return res.status(200).json({ statusCode: 200, data: orders });
+    return res.status(200).json({ statusCode: 200, data: orders, products:orderProducts });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return res.status(500).json({ statusCode: 500, data: { message: 'Server error', error: error.message } });

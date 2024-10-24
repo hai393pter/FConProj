@@ -63,67 +63,44 @@ export const getCart = async (req, res) => {
 };
 
 
-// Add product to cart
 export const addProductToCart = async (req, res) => {
   const { user_id, product_id, quantity } = req.body;
 
   try {
+    // Validate user existence
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res.status(400).json({ statusCode: 400, message: 'Không tìm thấy người dùng' });
+    }
+
     // Validate product existence
     const product = await Product.findByPk(product_id);
     if (!product) {
-      return res.status(200).json({ statusCode: 200, message: 'Không tìm thấy sản phẩm' });
+      return res.status(400).json({ statusCode: 400, message: 'Không tìm thấy sản phẩm' });
     }
 
-    // Check if the cart item already exists
+    // Check if the cart already exists
     let existingCartItem = await Cart.findOne({ where: { user_id, product_id } });
 
     if (existingCartItem) {
       // Update quantity if the product is already in the cart
       existingCartItem.quantity += quantity;
       await existingCartItem.save();
-
-      // Retrieve the cart item with product details after update
-      const updatedCartItem = await Cart.findOne({
-        where: { id: existingCartItem.id },
-        include: [
-          {
-            model: Product,
-            attributes: ['id', 'name', 'price', 'description', 'imageUrl'], // Specify product fields to include
-          },
-        ],
-      });
-
-      return res.status(200).json({ 
-        statusCode: 200, 
-        message: 'Sản phẩm đã được cập nhật trong giỏ hàng', 
-        data: updatedCartItem 
-      });
     } else {
-      // Create a new cart item if it doesn't exist
-      const newCartItem = await Cart.create({ user_id, product_id, quantity });
-
-      // Retrieve the cart item with product details after creation
-      const createdCartItem = await Cart.findOne({
-        where: { id: newCartItem.id },
-        include: [
-          {
-            model: Product,
-            attributes: ['id', 'name', 'price', 'description','imageUrl'], // Specify product fields to include
-          },
-        ],
-      });
-
-      return res.status(200).json({ 
-        statusCode: 200, 
-        message: 'Sản phẩm đã được thêm vào giỏ hàng', 
-        data: createdCartItem 
-      });
+      // Create a new cart if it doesn't exist
+      const newCart = await Cart.create({ user_id, product_id, quantity });
     }
+
+    return res.status(200).json({ 
+      statusCode: 200, 
+      message: 'Sản phẩm đã được thêm vào giỏ hàng' 
+    });
   } catch (error) {
-    console.error('Có lỗi khi thêm sản phẩm vào giỏ hàng', error);
+    console.error('Có lỗi khi thêm sản phẩm vào giỏ hàng:', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 
 // Update a cart (add items, etc.)

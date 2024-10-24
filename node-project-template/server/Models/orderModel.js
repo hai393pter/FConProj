@@ -1,8 +1,27 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database.js';
 
-class Order extends Model {}
+class Order extends Model {
+set order_date(value) {
+  // Add 7 hours (7 * 60 * 60 * 1000 milliseconds) to the input value
+  const vnDate = new Date(new Date(value).getTime() + (7 * 60 * 60 * 1000));
+  this.setDataValue('order_date', vnDate);
+}
 
+// Custom setter for createdAt
+set createdAt(value) {
+  // Add 7 hours to the input value
+  const vnDate = new Date(new Date(value).getTime() + (7 * 60 * 60 * 1000));
+  this.setDataValue('createdAt', vnDate);
+}
+
+// Custom setter for updatedAt
+set updatedAt(value) {
+  // Add 7 hours to the input value
+  const vnDate = new Date(new Date(value).getTime() + (7 * 60 * 60 * 1000));
+  this.setDataValue('updatedAt', vnDate);
+}
+}
 Order.init(
   {
     id: {

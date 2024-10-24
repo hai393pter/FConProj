@@ -2,6 +2,12 @@ import Order from '../Models/orderModel.js';
 import Cart from '../Models/cartModel.js';
 import Product from '../Models/productModel.js';
 
+const convertToVNTime = (date) => {
+  const vnTimeOffset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+  return new Date(new Date(date).getTime() + vnTimeOffset).toISOString();
+};
+
+// Create order
 export const createOrder = async (req, res) => {
   const { user_id } = req.body;
 
@@ -37,6 +43,11 @@ export const createOrder = async (req, res) => {
       });
     }));
 
+    // Xóa tất cả sản phẩm trong giỏ hàng sau khi đặt hàng
+    await Cart.destroy({
+      where: { user_id, status: 'not_paid' }
+    });
+
     // Prepare the order products response
     const orderProducts = cartItems.map(item => ({
       name: item.Product.name,
@@ -45,11 +56,19 @@ export const createOrder = async (req, res) => {
       price: item.Product.price,
     }));
 
+    // Convert dates to VN time
+    const orderResponse = {
+      ...order.toJSON(),
+      createdAt: convertToVNTime(order.createdAt),
+      updatedAt: convertToVNTime(order.updatedAt),
+      order_date: convertToVNTime(order.order_date),
+    };
+
     return res.status(200).json({
       statusCode: 200,
       data: {
         message: 'Order created successfully, Please Redirect To Payment',
-        order,
+        order: orderResponse,
         products: orderProducts
       }
     });
@@ -64,7 +83,6 @@ export const createOrder = async (req, res) => {
     });
   }
 };
-
 
 // Get all orders for a user
 export const getUserOrders = async (req, res) => {
@@ -98,6 +116,9 @@ export const getUserOrders = async (req, res) => {
     // Prepare the orders with product details
     const ordersWithDetails = orders.map(order => ({
       ...order.toJSON(), // Spread order data, convert to plain object
+      createdAt: convertToVNTime(order.createdAt),
+      updatedAt: convertToVNTime(order.updatedAt),
+      order_date: convertToVNTime(order.order_date),
       products: order.Carts.map(cart => ({
         name: cart.Product?.name || 'Unknown', // Ensure product name exists
         imageUrl: cart.Product?.imageUrl || null, // Ensure imageUrl exists

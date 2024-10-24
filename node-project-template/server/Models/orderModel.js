@@ -50,4 +50,6 @@ Order.init(
     tableName: 'orders',
   }
 );
+
+
 export default Order;

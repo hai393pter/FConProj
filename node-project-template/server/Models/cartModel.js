@@ -2,6 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../database.js';
 import User from './userModel.js';
 import Product from './productModel.js';
+
 class Cart extends Model {}
 
 Cart.init({
@@ -25,6 +26,14 @@ Cart.init({
       key: 'id',
     },
     allowNull: false,
+  },
+  order_id: {  // Thêm cột order_id
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'orders', // Bảng `Order`
+      key: 'id',
+    },
+    allowNull: true,  // Khi giỏ hàng chưa được thanh toán, có thể chưa có order_id
   },
   quantity: {
     type: DataTypes.INTEGER,
@@ -53,6 +62,6 @@ Cart.init({
 
 // Setting up associations
 Cart.belongsTo(User, { foreignKey: 'user_id' });
-Cart.belongsTo(Product, { foreignKey: 'product_id'});
+Cart.belongsTo(Product, { foreignKey: 'product_id' });
 
 export default Cart;

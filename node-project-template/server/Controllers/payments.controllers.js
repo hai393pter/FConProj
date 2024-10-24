@@ -2,6 +2,7 @@ import Payment from '../Models/paymentsModel.js';
 import Order from '../Models/orderModel.js';
 import crypto from 'crypto';
 import PayOS from '@payos/node';
+import Cart from '../Models/cartModel.js';
 
 const vnpUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const tmnCode = '0ZD5DIPY';
@@ -129,26 +130,53 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
   const { orderCode } = req.query;
 
   try {
+    // Kiểm tra nếu không có orderCode trong request
     if (!orderCode) {
-      console.error('No orderCode provided in the request.');
+      console.error('Error: No orderCode provided in the request.');
       return res.status(400).send('Bad Request: orderCode is required');
     }
+
+    // Tìm đơn hàng dựa trên orderCode
     const order = await Order.findByPk(orderCode);
 
-    if (order) {
-      console.log(`Current status of order ${order.id}: ${order.status}`);
-      const result = await order.update({ status: 'shipping' });
-      console.log(`Order ${order.id} updated to status: ${result.status}`);
-
-      const callback = `${order.callback}`;
-      return res.redirect(callback);
-    } else {
-      console.warn(`Order not found for orderCode: ${orderCode}`);
-      const callback = `${order.callback}`;
-      return res.redirect(callback);
+    // Kiểm tra nếu không tìm thấy đơn hàng
+    if (!order) {
+      console.error(`Error: Order not found for orderCode: ${orderCode}`);
+      return res.status(404).send('Order not found');
     }
+
+    console.log(`Current status of order ${order.id}: ${order.status}`);
+
+    // Cập nhật trạng thái đơn hàng thành 'shipping'
+    const updatedOrder = await order.update({ status: 'shipping' });
+    console.log(`Order ${order.id} updated to status: ${updatedOrder.status}`);
+
+    // Tìm tất cả các mục giỏ hàng liên quan đến đơn hàng này
+    const cartItems = await Cart.findAll({ where: { order_id: order.id } });
+
+    // Kiểm tra nếu không tìm thấy mục nào trong giỏ hàng
+    if (cartItems.length === 0) {
+      console.warn(`No cart items found for order ${order.id}`);
+    }
+
+    // Xóa các mục giỏ hàng
+    await Promise.all(cartItems.map(async (item) => {
+      try {
+        await item.destroy();
+        console.log(`Cart item ${item.id} for order ${order.id} has been deleted`);
+      } catch (error) {
+        console.error(`Error deleting cart item ${item.id}:`, error);
+      }
+    }));
+
+    console.log(`All cart items for order ${order.id} have been deleted`);
+
+    // Redirect tới callback URL nếu có
+    const callback = `${order.callback}`;
+    return res.redirect(callback);
+
   } catch (err) {
-    console.error('Error processing payment callback:', err);
+    console.error('Error processing payment callback:', err.message);
     return res.status(500).send('Internal Server Error');
   }
 }

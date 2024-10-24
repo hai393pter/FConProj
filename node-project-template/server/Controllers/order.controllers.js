@@ -1,15 +1,17 @@
 import Order from '../Models/orderModel.js';
 import Cart from '../Models/cartModel.js';
 import Product from '../Models/productModel.js';
+import { or } from 'sequelize';
 
 const convertToVNTime = (date) => {
   const vnTimeOffset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
   return new Date(new Date(date).getTime() + vnTimeOffset).toISOString();
 };
 
+
 // Create order
 export const createOrder = async (req, res) => {
-  const { user_id } = req.body;
+  const { user_id, user_name, user_phone, shipping_fee, payment_method, note, shipping_address } = req.body;
 
   try {
     // Find the cart for the user (assuming 'not_paid' status is used for active cart items)
@@ -29,10 +31,16 @@ export const createOrder = async (req, res) => {
     // Create an order
     const order = await Order.create({
       user_id,
-      total_price: totalPrice,
+      user_name,
+      user_phone,
+      total_price: totalPrice + shipping_fee, // Include shipping fee in the total price
       status: 'pending',
       callback: '', // Add the appropriate callback URL if necessary
       order_date: new Date(),
+      shipping_fee,
+      note,
+      shipping_address,
+      payment_method
     });
 
     // Associate cart items with the created order and update their status
@@ -124,7 +132,13 @@ export const getUserOrders = async (req, res) => {
         imageUrl: cart.Product?.imageUrl || null, // Ensure imageUrl exists
         quantity: cart.quantity,
         price: cart.Product?.price || 0, // Ensure price exists
-      }))
+      })),
+      user_name: order.user_name, //Return user's name
+      user_phone: order.user_phone, //Return user's phone
+      shipping_fee: order.shipping_fee, // Return shipping fee
+      note: order.note, // Return note
+      shipping_address: order.shipping_address, // Return shipping address
+      payment_method: order.payment_method // Return payment method
     }));
 
     // Return the orders along with product details

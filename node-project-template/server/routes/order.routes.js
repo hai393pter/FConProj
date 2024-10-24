@@ -20,6 +20,27 @@ const orderRouter = express.Router();
  *             properties:
  *               user_id:
  *                 type: integer
+ *                 description: Mã người dùng
+ *               user_name:
+ *                 type: string
+ *                 description: Tên người dùng
+ *               user_phone:
+ *                 type: string
+ *                 description: Số điện thoại người dùng
+ *               shipping_address:
+ *                 type: string
+ *                 description: Địa chỉ giao hàng
+ *               note:
+ *                 type: string
+ *                 description: Ghi chú cho đơn hàng (tuỳ chọn)
+ *               payment_method:
+ *                 type: string
+ *                 enum: [COD, bank_transfer]
+ *                 description: Phương thức thanh toán
+ *               shipping_fee:
+ *                 type: number
+ *                 format: float
+ *                 description: Phí vận chuyển
  *     responses:
  *       201:
  *         description: Đơn hàng đã được tạo
@@ -36,14 +57,15 @@ const orderRouter = express.Router();
  *                   description: Mã người dùng
  *                 status:
  *                   type: string
- *                   enum: [pending, shipped, delivered, cancelled]
- *                 created_at:
+ *                   enum: [pending, shipping, delivered, cancelled]
+ *                 createdAt:
  *                   type: string
  *                   format: date-time
  *       500:
  *         description: Server error
  */
 orderRouter.post('/', createOrder);
+
 
 // Route to get all orders for a user
 /**

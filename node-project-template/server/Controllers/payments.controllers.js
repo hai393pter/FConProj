@@ -137,7 +137,7 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
 
     if (order) {
       console.log(`Current status of order ${order.id}: ${order.status}`);
-      const result = await order.update({ status: 'Đang vận chuyển' });
+      const result = await order.update({ status: 'shipping' });
       console.log(`Order ${order.id} updated to status: ${result.status}`);
 
       const callback = `${order.callback}`;

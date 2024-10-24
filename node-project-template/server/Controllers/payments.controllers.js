@@ -140,11 +140,11 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
       const result = await order.update({ status: 'delivered' });
       console.log(`Order ${order.id} updated to status: ${result.status}`);
 
-      const callback = `${order.callback}/payments/success/${orderCode}`;
+      const callback = `${order.callback}`;
       return res.redirect(callback);
     } else {
       console.warn(`Order not found for orderCode: ${orderCode}`);
-      const callback = `${order.callback}/payments/failed/${orderCode}`;
+      const callback = `${order.callback}`;
       return res.redirect(callback);
     }
   } catch (err) {
@@ -168,7 +168,7 @@ export const payOsPaymentCallbackFailed = async (req, res) => {
     } else {
       console.warn(`Order not found for orderCode: ${orderCode}`);
     }
-    const callback = `${order?.callback}/payments/failed/${orderCode}`;
+    const callback = `${order?.callback}`;
     return res.redirect(callback);
   } catch (err) {
     console.error('Error processing payment callback:', err);

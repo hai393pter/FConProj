@@ -133,28 +133,13 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
       console.error('No orderCode provided in the request.');
       return res.status(400).send('Bad Request: orderCode is required');
     }
-
-    // Tìm đơn hàng dựa trên orderCode
     const order = await Order.findByPk(orderCode);
 
     if (order) {
       console.log(`Current status of order ${order.id}: ${order.status}`);
+      const result = await order.update({ status: 'shipping' });
+      console.log(`Order ${order.id} updated to status: ${result.status}`);
 
-      // Cập nhật trạng thái đơn hàng thành 'shipping'
-      const updatedOrder = await order.update({ status: 'shipping' });
-      console.log(`Order ${order.id} updated to status: ${updatedOrder.status}`);
-
-      // Tìm tất cả các mục giỏ hàng liên quan đến đơn hàng này
-      const cartItems = await Cart.findAll({ where: { order_id: order.id } });
-
-      // Xóa các mục giỏ hàng sau khi trạng thái đơn hàng chuyển thành 'shipping'
-      await Promise.all(cartItems.map(async (item) => {
-        await item.destroy(); // Hoặc bạn có thể cập nhật trạng thái của Cart thành 'shipped' nếu không muốn xóa
-      }));
-
-      console.log(`Cart items for order ${order.id} have been deleted`);
-
-      // Redirect tới callback URL nếu có
       const callback = `${order.callback}`;
       return res.redirect(callback);
     } else {
@@ -166,7 +151,7 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
     console.error('Error processing payment callback:', err);
     return res.status(500).send('Internal Server Error');
   }
-};
+}
 
 export const payOsPaymentCallbackFailed = async (req, res) => {
   const { orderCode } = req.query;

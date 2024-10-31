@@ -134,53 +134,54 @@ export const updateProduct = async (req, res) => {
 };
 
 // Filter products based on query parameters
+
 export const filterProducts = async (req, res) => {
     try {
-        const { category, min_price, max_price, page = 1, limit = 5 } = req.query;
+        const { category, min_price, max_price, page = 1, limit = 10 } = req.query;
 
-        // Chuyển đổi page và limit sang số nguyên
+        // Convert page and limit to integers
         const pageNumber = parseInt(page, 10) || 1;
-        const limitNumber = parseInt(limit, 10) || 5;
+        const limitNumber = parseInt(limit, 10) || 10; // Set limit to 10
 
-        // Tạo filter cho category và price
+        // Create filter for category and price
         let filter = {};
         if (category) {
-            filter.category = category;
+            filter.category = { [Op.like]: `%${category}%` }; // Use LIKE for partial matching
         }
 
         if (min_price || max_price) {
             filter.price = {};
             if (min_price && !isNaN(parseFloat(min_price))) {
-                filter.price[Op.gte] = parseFloat(min_price); // Lớn hơn hoặc bằng min_price
+                filter.price[Op.gte] = parseFloat(min_price); // Greater than or equal to min_price
             }
             if (max_price && !isNaN(parseFloat(max_price))) {
-                filter.price[Op.lte] = parseFloat(max_price); // Nhỏ hơn hoặc bằng max_price
+                filter.price[Op.lte] = parseFloat(max_price); // Less than or equal to max_price
             }
         }
 
-        // Tính toán offset cho pagination
+        // Calculate offset for pagination
         const offset = (pageNumber - 1) * limitNumber;
 
-        // Lấy danh sách sản phẩm đã filter với phân trang
+        // Fetch filtered product list with pagination
         const data = await Product.findAll({
             where: filter,
             limit: limitNumber,
             offset: offset
         });
 
-        // Lấy tổng số lượng sản phẩm đã filter
+        // Get total count of filtered products
         const totalElements = await Product.count({ where: filter });
 
-        // Tính số trang
+        // Calculate total pages
         const totalPages = Math.ceil(totalElements / limitNumber);
 
         return res.status(200).json({
             statusCode: 200,
-            message: "Lọc sản phẩm thành công",
+            message: "Products filtered successfully",
             data: {
                 totalPages,
                 totalElements,
-                size: limitNumber, // Số lượng sản phẩm trong mỗi trang
+                size: limitNumber, // Number of products per page
                 currentPage: pageNumber,
                 content: data
             }
@@ -189,11 +190,12 @@ export const filterProducts = async (req, res) => {
         console.error('Error filtering products:', error);
         return res.status(500).json({ 
             statusCode: 500, 
-            message: 'Lỗi server', 
+            message: 'Server error', 
             error: error.message 
         });
     }
 };
+
 
 
 // Tất cả các hàm

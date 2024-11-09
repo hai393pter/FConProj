@@ -2,7 +2,6 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database.js'; // Đảm bảo đường dẫn đúng
 import moment from 'moment-timezone';
 
-
 class Product extends Model {}
 
 Product.init(
@@ -15,7 +14,7 @@ Product.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        category:{
+        category: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -25,7 +24,12 @@ Product.init(
         },
         imageUrl: {
             type: DataTypes.STRING,
-            allowNull: false, 
+            allowNull: false,
+        },
+        unit: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'hộp', // Đặt giá trị mặc định là 'hộp'
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -33,7 +37,8 @@ Product.init(
             get() {
                 return moment(this.getDataValue('createdAt')).tz('Asia/Bangkok').format();
             }
-        },updatedAt: {
+        },
+        updatedAt: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {

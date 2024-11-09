@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 // Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
     console.log(req.body);
-    const { name, category, price, description, imageUrl } = req.body; // Lấy thông tin sản phẩm từ body
+    const { name, category, price, description, imageUrl, unit } = req.body; // Lấy thông tin sản phẩm từ body
 
     try {
         const newProduct = await Product.create({ 
@@ -14,6 +14,7 @@ export const createProduct = async (req, res) => {
             price, 
             description, 
             imageUrl, 
+            unit, // Thêm unit vào lúc tạo sản phẩm
             timeStamp: moment().tz('Asia/Bangkok').toDate() 
         });
         return res.status(200).json({ 
@@ -30,6 +31,7 @@ export const createProduct = async (req, res) => {
         });
     }
 };
+
 
 // Get all products based on category, min(max) price
 export const getAllProducts = async (req, res) => {
@@ -95,10 +97,11 @@ export const getProduct = async (req, res) => {
     }
 };
 
+
 // Chỉnh sửa thông tin sản phẩm theo ID
 export const updateProduct = async (req, res) => {
     const { id } = req.body; // Thay đổi: Lấy ID từ body
-    const { name, category, price, description, imageUrl } = req.body;
+    const { name, category, price, description, imageUrl, unit } = req.body; // Thêm unit vào req.body
 
     try {
         const data = await Product.findByPk(id);
@@ -114,6 +117,7 @@ export const updateProduct = async (req, res) => {
         data.price = price || data.price;
         data.description = description || data.description;
         data.imageUrl = imageUrl || data.imageUrl;
+        data.unit = unit || data.unit; // Cập nhật unit
         data.updatedAt = moment().tz('Asia/Bangkok').toDate(); // Cập nhật thời gian theo giờ Việt Nam
         data.timeStamp = moment().tz('Asia/Bangkok').toDate();
         await data.save();
@@ -133,17 +137,18 @@ export const updateProduct = async (req, res) => {
     }
 };
 
+
 // Filter products based on query parameters
 
 export const filterProducts = async (req, res) => {
     try {
-        const { category, min_price, max_price, page = 1, limit = 10 } = req.query;
+        const { category, min_price, max_price, unit, page = 1, limit = 10 } = req.query;
 
         // Convert page and limit to integers
         const pageNumber = parseInt(page, 10) || 1;
         const limitNumber = parseInt(limit, 10) || 10; // Set limit to 10
 
-        // Create filter for category and price
+        // Create filter for category, price, and unit
         let filter = {};
         if (category) {
             filter.category = { [Op.like]: `%${category}%` }; // Use LIKE for partial matching
@@ -157,6 +162,10 @@ export const filterProducts = async (req, res) => {
             if (max_price && !isNaN(parseFloat(max_price))) {
                 filter.price[Op.lte] = parseFloat(max_price); // Less than or equal to max_price
             }
+        }
+
+        if (unit) {
+            filter.unit = { [Op.like]: `%${unit}%` }; // Filter by unit, use LIKE for partial matching
         }
 
         // Calculate offset for pagination

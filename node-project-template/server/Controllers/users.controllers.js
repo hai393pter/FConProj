@@ -369,11 +369,11 @@ export const resetPassword = async (req, res) => {
         statusCode: 200,
         message: 'Users retrieved successfully',
         data: {
-          users: rows,
+          content: rows,
           pagination: {
             currentPage: pageInt,
             totalPages,
-            totalUsers: count,
+            totalElements: count,
             limit: limitInt,
           },
         },

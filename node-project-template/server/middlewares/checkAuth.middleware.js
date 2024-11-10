@@ -12,10 +12,10 @@ const checkAuth = (req, res, next) => {
         if (err) {
             return res.status(403).json({ message: "Invalid token." });
         }
+        console.log('Decoded User:', user); // Log the decoded user to check the payload
         req.user = user; // Attach user info to request object
         next(); // Proceed to the next middleware/controller
     });
 };
-
 export default checkAuth;
 

@@ -2,6 +2,8 @@
 import express from 'express';
 import checkAuth from '../middlewares/checkAuth.middleware.js';
 import userControllers from '../Controllers/users.controllers.js';
+import { checkAdmin } from '../middlewares/checkAdmin.middlewares.js';
+import { getAllUsers } from '../Controllers/users.controllers.js';
 //import routers from './users.routes.js';
 const usersRouter = express.Router();
 /**
@@ -273,6 +275,41 @@ usersRouter.post('/reset-password', userControllers.resetPassword);
  */
 usersRouter.put('/update-info', checkAuth, userControllers.updateUserInfo);
 
+
+
+/**
+ * @openapi
+ * /users:
+ *   get:
+ *     summary: Get all users (Admin only) with pagination
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: The page number
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: The number of users per page
+ *     responses:
+ *       200:
+ *         description: List of all users with pagination info
+ *       403:
+ *         description: Forbidden - Admin access only
+ *       500:
+ *         description: Server error
+ */
+usersRouter.get('/', checkAuth, checkAdmin, getAllUsers);
 
 
 export default usersRouter;

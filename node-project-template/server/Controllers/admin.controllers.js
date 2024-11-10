@@ -36,7 +36,6 @@ export const registerAdmin = async (req, res) => {
   }
 };
 
-// Login an admin
 export const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -51,21 +50,30 @@ export const loginAdmin = async (req, res) => {
     console.log('Password provided by user:', password);
     console.log('Hashed password in DB:', admin.password_hash);
 
-    // Check if password matches
+    // Check if password matches using argon2
     const isMatch = await argon2.verify(admin.password_hash, password);
     if (!isMatch) {
       console.log('Password does not match');
       return res.status(400).json({ statusCode: 400, message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
+    // Retrieve the role of the admin from the Admin table
+    const role = admin.role;  // role will be 'admin' or 'superadmin'
+
+    // Generate JWT token with admin's role included
     const token = jwt.sign(
-      { id: admin.id, username: admin.username },
+      { id: admin.id, email: admin.email, username: admin.username, role },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' } // Token expiration time
+      { expiresIn: '1h' }  // Token expiration time
     );
 
-    return res.status(200).json({ statusCode: 200, token, message: 'Login successful' });
+    // Send the token in the response
+    return res.status(200).json({
+      statusCode: 200,
+      token,
+      message: 'Login successful'
+    });
+
   } catch (error) {
     console.error('Error logging in admin:', error);
     return res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });

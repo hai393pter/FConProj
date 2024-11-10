@@ -1,7 +1,10 @@
 import Order from '../Models/orderModel.js';
 import Cart from '../Models/cartModel.js';
 import Product from '../Models/productModel.js';
+import User from '../Models/userModel.js';
+import Status from '../models/Status.js';
 import { or } from 'sequelize';
+import { Op } from 'sequelize';
 
 const convertToVNTime = (date) => {
   const vnTimeOffset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
@@ -175,8 +178,75 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+
+//Get all orders
+
+// Controller function to get all orders
+// Controller function to get all orders, with optional email filter
+export const getAllOrders = async (req, res) => {
+  const { email } = req.query; // Get the email filter from query parameters (if any)
+
+  try {
+    // Start building the query
+    let whereClause = {};
+
+    // If email is provided, filter by user's email
+    if (email) {
+      const user = await User.findOne({
+        where: { email: { [Op.like]: `%${email}%` } } // Filter users by email (LIKE query)
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          statusCode: 404,
+          message: 'User not found with the given email',
+        });
+      }
+
+      // If user is found, filter orders by user_id
+      whereClause.user_id = user.id;
+    }
+
+    // Fetch orders with associated user and cart data
+    const orders = await Order.findAll({
+      where: whereClause,  // Apply the email filter if any
+      include: [
+        {
+          model: Cart,
+          include: [
+            {
+              model: Product,
+              attributes: ['id', 'name', 'imageUrl', 'price'],
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ['id', 'name', 'phone'], // Include necessary fields from User
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Orders retrieved successfully',
+      data: orders,
+    });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'An error occurred while fetching orders',
+      error: error.message,
+    });
+  }
+};
+
+
+
 export default {
   createOrder,
   getUserOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  getAllOrders
 };

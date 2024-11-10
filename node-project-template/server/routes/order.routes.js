@@ -1,6 +1,7 @@
 import express from 'express';
-import { createOrder, getUserOrders, updateOrderStatus } from '../Controllers/order.controllers.js';
-
+import { createOrder, getUserOrders, updateOrderStatus, getAllOrders } from '../Controllers/order.controllers.js';
+import checkAuth from '../middlewares/checkAuth.middleware.js';
+import { checkAdmin } from '../middlewares/checkAdmin.middlewares.js'; 
 const orderRouter = express.Router();
 
 // Route to create a new order
@@ -145,5 +146,110 @@ orderRouter.get('/:user_id', getUserOrders);
  *         description: Server error
  */
 orderRouter.put('/:order_id', updateOrderStatus);
+
+
+/**
+ * @openapi
+ * /orders:
+ *   get:
+ *     summary: Get all orders (Admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         description: Optional filter to search for orders by user email
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "example@example.com"
+ *     responses:
+ *       200:
+ *         description: List of all orders with user, product, and status details, optionally filtered by email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: "Orders retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       user_id:
+ *                         type: integer
+ *                       user_name:
+ *                         type: string
+ *                       user_phone:
+ *                         type: string
+ *                       total_price:
+ *                         type: number
+ *                         format: float
+ *                       status:
+ *                         type: string
+ *                       order_date:
+ *                         type: string
+ *                         format: date-time
+ *                       shipping_fee:
+ *                         type: number
+ *                         format: float
+ *                       voucher_code:
+ *                         type: string
+ *                       discount_amount:
+ *                         type: number
+ *                         format: float
+ *                       note:
+ *                         type: string
+ *                       shipping_address:
+ *                         type: string
+ *                       payment_method:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       Carts:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                             quantity:
+ *                               type: integer
+ *                             Product:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                 name:
+ *                                   type: string
+ *                                 imageUrl:
+ *                                   type: string
+ *                                 price:
+ *                                   type: number
+ *                                   format: float
+ *       403:
+ *         description: Forbidden - Admin access only
+ *       404:
+ *         description: User not found with the given email (if email filter is applied)
+ *       500:
+ *         description: Server error
+ */
+orderRouter.get('/', checkAuth, checkAdmin, getAllOrders);
+
+
 
 export default orderRouter;

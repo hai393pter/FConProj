@@ -334,8 +334,61 @@ export const resetPassword = async (req, res) => {
       });
     }
   };
+
+
+  export const getAllUsers = async (req, res) => {
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+  
+    try {
+      // Convert page and limit to integers
+      const pageInt = parseInt(page);
+      const limitInt = parseInt(limit);
+  
+      // Ensure page and limit are valid numbers
+      if (isNaN(pageInt) || isNaN(limitInt) || pageInt <= 0 || limitInt <= 0) {
+        return res.status(400).json({
+          statusCode: 400,
+          message: 'Invalid page or limit parameter',
+        });
+      }
+  
+      // Calculate the offset for pagination
+      const offset = (pageInt - 1) * limitInt;
+  
+      // Fetch users with pagination
+      const { count, rows } = await User.findAndCountAll({
+        limit: limitInt,   // Number of records per page
+        offset: offset,    // Pagination offset
+        attributes: ['id', 'name', 'email', 'address','phone', 'createdAt'], // You can customize this
+      });
+  
+      // Calculate the total number of pages
+      const totalPages = Math.ceil(count / limitInt);
+  
+      return res.status(200).json({
+        statusCode: 200,
+        message: 'Users retrieved successfully',
+        data: {
+          users: rows,
+          pagination: {
+            currentPage: pageInt,
+            totalPages,
+            totalUsers: count,
+            limit: limitInt,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+      return res.status(500).json({
+        statusCode: 500,
+        message: 'An error occurred while fetching users',
+        error: error.message,
+      });
+    }
+  };
 // Export functions
 export default { register, login, getMe,changePassword,
     forgotPassword,
     resetPassword,
-    updateUserInfo };
+    updateUserInfo, getAllUsers };

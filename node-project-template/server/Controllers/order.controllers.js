@@ -2,8 +2,6 @@ import Order from '../Models/orderModel.js';
 import Cart from '../Models/cartModel.js';
 import Product from '../Models/productModel.js';
 import User from '../Models/userModel.js';
-import Status from '../models/Status.js';
-import { or } from 'sequelize';
 import { Op } from 'sequelize';
 
 const convertToVNTime = (date) => {

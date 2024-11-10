@@ -2,6 +2,8 @@ import Order from '../Models/orderModel.js';
 import Cart from '../Models/cartModel.js';
 import Product from '../Models/productModel.js';
 import User from '../Models/userModel.js';
+import Status from '../models/Status.js';
+import { or } from 'sequelize';
 import { Op } from 'sequelize';
 
 const convertToVNTime = (date) => {
@@ -249,11 +251,11 @@ export const getAllOrders = async (req, res) => {
       statusCode: 200,
       message: 'Orders retrieved successfully',
       data: {
-        orders: rows,
+        content: rows,
         pagination: {
           currentPage: pageInt,
           totalPages,
-          totalOrders: count,
+          totalElements: count,
           limit: limitInt,
         },
       },

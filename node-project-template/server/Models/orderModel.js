@@ -24,7 +24,10 @@ class Order extends Model {
 }
 
 Order.init(
-  {
+  {status: {
+    type: DataTypes.ENUM('pending', 'shipping', 'delivered', 'cancelled'),
+    defaultValue: 'pending',
+  },
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -46,10 +49,6 @@ Order.init(
     total_price: {
       type: DataTypes.FLOAT,
       allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM('pending', 'shipping', 'delivered', 'cancelled'),
-      defaultValue: 'pending',
     },
     order_date: {
       type: DataTypes.DATE,

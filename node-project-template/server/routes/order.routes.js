@@ -152,7 +152,7 @@ orderRouter.put('/:order_id', updateOrderStatus);
  * @openapi
  * /orders:
  *   get:
- *     summary: Get all orders (Admin only)
+ *     summary: Get all orders with optional email filter and pagination (Admin only)
  *     security:
  *       - bearerAuth: []
  *     tags:
@@ -165,6 +165,22 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *         schema:
  *           type: string
  *           example: "example@example.com"
+ *       - in: query
+ *         name: page
+ *         description: Page number for pagination (default is 1)
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         description: Number of orders per page for pagination (default is 10)
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           example: 10
  *     responses:
  *       200:
  *         description: List of all orders with user, product, and status details, optionally filtered by email
@@ -180,67 +196,85 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *                   type: string
  *                   example: "Orders retrieved successfully"
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       user_id:
- *                         type: integer
- *                       user_name:
- *                         type: string
- *                       user_phone:
- *                         type: string
- *                       total_price:
- *                         type: number
- *                         format: float
- *                       status:
- *                         type: string
- *                       order_date:
- *                         type: string
- *                         format: date-time
- *                       shipping_fee:
- *                         type: number
- *                         format: float
- *                       voucher_code:
- *                         type: string
- *                       discount_amount:
- *                         type: number
- *                         format: float
- *                       note:
- *                         type: string
- *                       shipping_address:
- *                         type: string
- *                       payment_method:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
- *                       Carts:
- *                         type: array
- *                         items:
- *                           type: object
- *                           properties:
- *                             id:
- *                               type: integer
- *                             quantity:
- *                               type: integer
- *                             Product:
+ *                   type: object
+ *                   properties:
+ *                     orders:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           user_id:
+ *                             type: integer
+ *                           user_name:
+ *                             type: string
+ *                           user_phone:
+ *                             type: string
+ *                           total_price:
+ *                             type: number
+ *                             format: float
+ *                           status:
+ *                             type: string
+ *                           order_date:
+ *                             type: string
+ *                             format: date-time
+ *                           shipping_fee:
+ *                             type: number
+ *                             format: float
+ *                           voucher_code:
+ *                             type: string
+ *                           discount_amount:
+ *                             type: number
+ *                             format: float
+ *                           note:
+ *                             type: string
+ *                           shipping_address:
+ *                             type: string
+ *                           payment_method:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                           Carts:
+ *                             type: array
+ *                             items:
  *                               type: object
  *                               properties:
  *                                 id:
  *                                   type: integer
- *                                 name:
- *                                   type: string
- *                                 imageUrl:
- *                                   type: string
- *                                 price:
- *                                   type: number
- *                                   format: float
+ *                                 quantity:
+ *                                   type: integer
+ *                                 Product:
+ *                                   type: object
+ *                                   properties:
+ *                                     id:
+ *                                       type: integer
+ *                                     name:
+ *                                       type: string
+ *                                     imageUrl:
+ *                                       type: string
+ *                                     price:
+ *                                       type: number
+ *                                       format: float
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         currentPage:
+ *                           type: integer
+ *                           example: 1
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 10
+ *                         totalOrders:
+ *                           type: integer
+ *                           example: 100
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
  *       403:
  *         description: Forbidden - Admin access only
  *       404:
@@ -248,6 +282,7 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *       500:
  *         description: Server error
  */
+
 orderRouter.get('/', checkAuth, checkAdmin, getAllOrders);
 
 

@@ -184,16 +184,28 @@ export const updateOrderStatus = async (req, res) => {
 // Controller function to get all orders
 // Controller function to get all orders, with optional email filter
 export const getAllOrders = async (req, res) => {
-  const { email } = req.query; // Get the email filter from query parameters (if any)
+  const { email, page = 1, limit = 10 } = req.query; // Get the email filter and pagination params from query
 
   try {
+    // Convert page and limit to integers
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+
+    // Validate page and limit
+    if (isNaN(pageInt) || isNaN(limitInt) || pageInt <= 0 || limitInt <= 0) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: 'Invalid page or limit parameter',
+      });
+    }
+
     // Start building the query
     let whereClause = {};
 
     // If email is provided, filter by user's email
     if (email) {
       const user = await User.findOne({
-        where: { email: { [Op.like]: `%${email}%` } } // Filter users by email (LIKE query)
+        where: { email: { [Op.like]: `%${email}%` } }, // Filter users by email (LIKE query)
       });
 
       if (!user) {
@@ -207,8 +219,11 @@ export const getAllOrders = async (req, res) => {
       whereClause.user_id = user.id;
     }
 
-    // Fetch orders with associated user and cart data
-    const orders = await Order.findAll({
+    // Calculate the offset for pagination
+    const offset = (pageInt - 1) * limitInt;
+
+    // Fetch orders with associated user and cart data, apply pagination
+    const { count, rows } = await Order.findAndCountAll({
       where: whereClause,  // Apply the email filter if any
       include: [
         {
@@ -225,12 +240,25 @@ export const getAllOrders = async (req, res) => {
           attributes: ['id', 'name', 'phone'], // Include necessary fields from User
         },
       ],
+      limit: limitInt,    // Limit the number of results per page
+      offset: offset,     // Pagination offset
     });
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(count / limitInt);
 
     return res.status(200).json({
       statusCode: 200,
       message: 'Orders retrieved successfully',
-      data: orders,
+      data: {
+        orders: rows,
+        pagination: {
+          currentPage: pageInt,
+          totalPages,
+          totalOrders: count,
+          limit: limitInt,
+        },
+      },
     });
   } catch (error) {
     console.error('Error fetching all orders:', error);

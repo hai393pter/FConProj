@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrder, getUserOrders, updateOrderStatus, getAllOrders } from '../Controllers/order.controllers.js';
+import { createOrder, getUserOrders, updateOrderStatus, getAllOrders, getTotalOrders } from '../Controllers/order.controllers.js';
 import checkAuth from '../middlewares/checkAuth.middleware.js';
 import { checkAdmin } from '../middlewares/checkAdmin.middlewares.js'; 
 const orderRouter = express.Router();
@@ -71,7 +71,7 @@ orderRouter.post('/', createOrder);
 // Route to get all orders for a user
 /**
  * @openapi
- * /orders/{user_id}:
+ * /orders/:user_id:
  *   get:
  *     summary: Lấy tất cả đơn hàng
  *     tags:
@@ -152,7 +152,7 @@ orderRouter.put('/:order_id', updateOrderStatus);
  * @openapi
  * /orders:
  *   get:
- *     summary: Get all orders with optional email filter and pagination (Admin only)
+ *     summary: Get all orders (Admin only)
  *     security:
  *       - bearerAuth: []
  *     tags:
@@ -166,24 +166,22 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *           type: string
  *           example: "example@example.com"
  *       - in: query
- *         name: page
- *         description: Page number for pagination (default is 1)
+ *         name: orderId
+ *         description: Optional filter to search for a specific order by orderId
  *         required: false
  *         schema:
  *           type: integer
- *           default: 1
  *           example: 1
  *       - in: query
- *         name: limit
- *         description: Number of orders per page for pagination (default is 10)
+ *         name: listStatus
+ *         description: Optional filter to search for orders by status (comma separated list of statuses)
  *         required: false
  *         schema:
- *           type: integer
- *           default: 10
- *           example: 10
+ *           type: string
+ *           example: "pending,shipped"
  *     responses:
  *       200:
- *         description: List of all orders with user, product, and status details, optionally filtered by email
+ *         description: List of all orders with user, product, and status details, optionally filtered by email, orderId, and status
  *         content:
  *           application/json:
  *             schema:
@@ -219,6 +217,8 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *                           order_date:
  *                             type: string
  *                             format: date-time
+ *                           callback:
+ *                             type: string
  *                           shipping_fee:
  *                             type: number
  *                             format: float
@@ -239,42 +239,26 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *                           updatedAt:
  *                             type: string
  *                             format: date-time
- *                           Carts:
- *                             type: array
- *                             items:
- *                               type: object
- *                               properties:
- *                                 id:
- *                                   type: integer
- *                                 quantity:
- *                                   type: integer
- *                                 Product:
- *                                   type: object
- *                                   properties:
- *                                     id:
- *                                       type: integer
- *                                     name:
- *                                       type: string
- *                                     imageUrl:
- *                                       type: string
- *                                     price:
- *                                       type: number
- *                                       format: float
+ *                           User:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: integer
+ *                               name:
+ *                                 type: string
+ *                               phone:
+ *                                 type: string
  *                     pagination:
  *                       type: object
  *                       properties:
  *                         currentPage:
  *                           type: integer
- *                           example: 1
  *                         totalPages:
  *                           type: integer
- *                           example: 10
- *                         totalOrders:
+ *                         totalElements:
  *                           type: integer
- *                           example: 100
  *                         limit:
  *                           type: integer
- *                           example: 10
  *       403:
  *         description: Forbidden - Admin access only
  *       404:
@@ -283,8 +267,48 @@ orderRouter.put('/:order_id', updateOrderStatus);
  *         description: Server error
  */
 
+
 orderRouter.get('/', checkAuth, checkAdmin, getAllOrders);
 
 
+/**
+ * @openapi
+ * /orders/count:
+*     get:
+*       summary: Get total count of orders (Admin only)
+*       security:
+*         - bearerAuth: []  # Ensure that the request requires a Bearer token (authentication)
+*       tags:
+*         - Orders
+*       responses:
+*         200:
+*           description: Total number of orders count retrieved successfully
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   statusCode:
+*                     type: integer
+*                     example: 200
+*                   message:
+*                     type: string
+*                     example: "Total orders count retrieved successfully"
+*                   data:
+*                     type: object
+*                     properties:
+*                       totalOrders:
+*                         type: integer
+*                         example: 70
+*         403:
+*           description: Forbidden - Admin access only
+*         500:
+*           description: Server error
+*       operationId: getTotalOrders
+*       x-security:
+*         - checkAuth: []    # Ensure the user is authenticated
+*         - checkAdmin: []   # Ensure the user has admin privileges
+ */
 
+orderRouter.get('/count', getTotalOrders,checkAdmin,checkAuth);
 export default orderRouter;

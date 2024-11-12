@@ -5,6 +5,7 @@ import productRoute from './products.routes.js';
 import cartRoute from './carts.routes.js';
 import orderRoute from './order.routes.js';
 import paymentsRoute from './payments.routes.js';
+import dashboardRoute from './dashboard.routes.js';
 
 const routes = [
     {path: '/admins', router: adminRoute},
@@ -14,6 +15,7 @@ const routes = [
     {path: '/carts', router: cartRoute},
     {path: '/orders', router: orderRoute},
     {path: '/payments', router: paymentsRoute},
+    {path: '/dashboard', router: dashboardRoute},
 ];
 
 export default routes;

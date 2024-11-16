@@ -17,13 +17,13 @@ export const createOrder = async (req, res) => {
   const { user_id, user_name, user_phone, shipping_fee, payment_method, note, shipping_address } = req.body;
 
   try {
-    // Find the cart for the user (assuming 'not_paid' status is used for active cart items)
+    // Find the cart for the user (active items)
     const cartItems = await Cart.findAll({
       where: { user_id, status: 'not_paid' },
       include: [Product]
     });
 
-    // Check if the cart is empty
+    // Check if cart is empty
     if (!cartItems.length) {
       return res.status(400).json({ statusCode: 400, data: { message: 'Cart is empty' } });
     }
@@ -31,14 +31,14 @@ export const createOrder = async (req, res) => {
     // Calculate total price
     const totalPrice = cartItems.reduce((acc, item) => acc + item.quantity * item.Product.price, 0);
 
-    // Create an order
+    // Create order
     const order = await Order.create({
       user_id,
       user_name,
       user_phone,
-      total_price: totalPrice + shipping_fee, // Include shipping fee in the total price
+      total_price: totalPrice + shipping_fee,
       status: 'pending',
-      callback: '', // Add the appropriate callback URL if necessary
+      callback: '',
       order_date: new Date(),
       shipping_fee,
       note,
@@ -46,20 +46,15 @@ export const createOrder = async (req, res) => {
       payment_method
     });
 
-    // Associate cart items with the created order and update their status
-    await Promise.all(cartItems.map(item => {
-      return item.update({ 
-        order_id: order.id, // Associate the cart item with the new order
-        status: 'paid' // Mark the item as paid
+    // Update cart items with order_id and mark as paid
+    await Promise.all(cartItems.map(async (item) => {
+      await item.update({
+        order_id: order.id, // Assign order_id to cart items
+        status: 'cleared' // Mark as cleared (instead of deleting)
       });
     }));
 
-    // Xóa tất cả sản phẩm trong giỏ hàng sau khi đặt hàng
-    await Cart.destroy({
-      where: { user_id, status: 'not_paid' }
-    });
-
-    // Prepare the order products response
+    // Prepare order products response
     const orderProducts = cartItems.map(item => ({
       name: item.Product.name,
       imageUrl: item.Product.imageUrl,
@@ -85,15 +80,13 @@ export const createOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating order:', error);
-    return res.status(500).json({ 
-      statusCode: 500, 
-      data: { 
-        message: 'Server error', 
-        error: error.message 
-      } 
+    return res.status(500).json({
+      statusCode: 500,
+      data: { message: 'Server error', error: error.message }
     });
   }
 };
+
 
 // Get all orders for a user
 export const getUserOrders = async (req, res) => {

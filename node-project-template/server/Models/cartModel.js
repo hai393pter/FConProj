@@ -2,6 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../database.js';
 import User from './userModel.js';
 import Product from './productModel.js';
+import Order from './orderModel.js';
 
 class Cart extends Model {
   // Custom setter for createdAt
@@ -44,7 +45,7 @@ Cart.init({
   order_id: {  // Thêm cột order_id
     type: DataTypes.INTEGER,
     references: {
-      model: 'orders', // Bảng `Order`
+      model: Order, // Bảng `Order`
       key: 'id',
     },
     allowNull: true,  // Khi giỏ hàng chưa được thanh toán, có thể chưa có order_id

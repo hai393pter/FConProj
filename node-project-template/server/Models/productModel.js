@@ -21,10 +21,16 @@ Product.init(
         price: {
             type: DataTypes.FLOAT,
             allowNull: false,
+            validate: {
+                isFloat: true, // Kiểm tra rằng giá phải là một số thực
+            },
         },
         imageUrl: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                isUrl: true, // Kiểm tra rằng imageUrl là một URL hợp lệ
+            },
         },
         unit: {
             type: DataTypes.STRING,
@@ -57,8 +63,8 @@ Product.init(
         sequelize,
         modelName: 'Product',
         tableName: 'products',
-        timestamps: true, // Enable timestamps
+        timestamps: true, // Bật tính năng timestamps của Sequelize
     }
-)
+);
 
 export default Product;

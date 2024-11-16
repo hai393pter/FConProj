@@ -118,8 +118,8 @@ export const getUserOrders = async (req, res) => {
     });
 
     if (!orders || !orders.length) {
-      return res.status(404).json({
-        statusCode: 404,
+      return res.status(200).json({
+        statusCode: 200,
         data: { message: 'No orders found for the user' }
       });
     }

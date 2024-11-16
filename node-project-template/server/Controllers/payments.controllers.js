@@ -88,6 +88,11 @@ export const paymentCallback = async (req, res) => {
           transactionId: vnp_TransactionNo,
         },
         { where: { order_id: vnp_TxnRef } }
+        
+      );
+      await Cart.update(
+        { order_id: null }, // Set order_id to null
+        { where: { order_id: vnp_TxnRef } }
       );
 
       return res.status(200).json({ statusCode: 200, data: { message: 'Payment successful', transactionId: vnp_TransactionNo } });
@@ -150,7 +155,10 @@ export const payOsPaymentCallbackSuccess = async (req, res) => {
     // Cập nhật trạng thái đơn hàng thành 'shipping'
     const updatedOrder = await order.update({ status: 'shipping' });
     console.log(`Order ${order.id} updated to status: ${updatedOrder.status}`);
-
+    await Cart.update(
+      { order_id: null }, // Set order_id to null
+      { where: { order_id: vnp_TxnRef } }
+    );
     // Tìm tất cả các mục giỏ hàng liên quan đến đơn hàng này
     const cartItems = await Cart.findAll({ where: { order_id: order.id } });
 

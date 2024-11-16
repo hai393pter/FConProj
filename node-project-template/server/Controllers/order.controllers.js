@@ -50,7 +50,7 @@ export const createOrder = async (req, res) => {
     await Promise.all(cartItems.map(async (item) => {
       await item.update({
         order_id: order.id, // Assign order_id to cart items
-        status: 'cleared' // Mark as cleared (instead of deleting)
+        status: 'paid' // Mark as cleared (instead of deleting)
       });
     }));
 

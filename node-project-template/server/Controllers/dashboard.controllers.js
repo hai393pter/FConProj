@@ -1,5 +1,3 @@
-// dashboard.controller.js
-
 // Import necessary models
 import Order from '../Models/orderModel.js';
 import Product from '../Models/productModel.js';
@@ -13,8 +11,13 @@ export const getDashboardMetrics = async (req, res) => {
     // Fetch total count of products
     const totalProducts = await Product.count();
 
-    // Calculate total revenue from all orders
-    const totalRevenue = await Order.sum('total_price');
+    // Calculate total revenue only from orders with valid status
+    const validStatuses = ['delivered', 'shipping', 'pending']; // Define valid statuses
+    const totalRevenue = await Order.sum('total_price', {
+      where: {
+        status: validStatuses
+      }
+    });
 
     // Return metrics as a JSON response
     return res.status(200).json({

@@ -46,11 +46,11 @@ export const createOrder = async (req, res) => {
       payment_method
     });
 
-    // Update cart items with order_id and mark as paid
+    // Update cart items with order_id and mark as paid (without deleting)
     await Promise.all(cartItems.map(async (item) => {
       await item.update({
         order_id: order.id, // Assign order_id to cart items
-        status: 'paid' // Mark as cleared (instead of deleting)
+        status: 'paid' // Mark as paid, not deleted
       });
     }));
 
